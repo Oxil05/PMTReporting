@@ -1,5 +1,5 @@
 /**
- * Instructional Material & Strategies - Interactive HTML Slide Deck Controller
+ * Instructional Material & Strategies - Fully Responsive Slide Deck Controller
  */
 
 (function () {
@@ -137,13 +137,13 @@
     // Title Slide (Slide 1)
     if (slide.number === 1) {
       html = `
-        <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+        <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
           <span class="slide-header-tag">${slide.tag}</span>
           <h1 class="slide-title-hero">INSTRUCTIONAL MATERIAL / STRATEGY OF TEACHING</h1>
           <p class="slide-subtitle">A Comprehensive Guide to Methods, Techniques, Strategies & Educational Devices</p>
-          <div style="margin-top: 30px; display: inline-flex; gap: 20px; background: rgba(0,0,0,0.3); padding: 12px 24px; border-radius: 30px; border: 1px solid var(--border-mint);">
-            <span style="font-size: 0.9rem; color: var(--primary-mint); font-weight: 700;">Presenter: Shawn Garcia | Liceria & Co.</span>
-            <span style="font-size: 0.9rem; color: var(--text-muted);">2026 February 9</span>
+          <div style="margin-top: 20px; display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 16px; background: rgba(0,0,0,0.35); padding: 12px 24px; border-radius: 30px; border: 1px solid var(--border-mint);">
+            <span style="font-size: 0.9rem; color: var(--primary-mint); font-weight: 700;">Group 5 • BSIT-31A</span>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">Shawn Garcia • Liceria & Co.</span>
           </div>
         </div>
       `;
@@ -151,9 +151,9 @@
     // Bible Verse Slide (Slide 45)
     else if (slide.number === 45) {
       html = `
-        <div style="text-align: center; max-width: 800px; margin: 0 auto; padding: 30px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid var(--border-mint);">
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; padding: 24px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid var(--border-mint); width: 100%;">
           <span class="slide-header-tag">BIBLE VERSE</span>
-          <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff; line-height: 1.6; margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.8rem); color: #fff; line-height: 1.6; margin-bottom: 16px;">
             “A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”
           </h2>
           <div style="font-size: 1.1rem; color: var(--primary-mint); font-weight: 800; letter-spacing: 0.05em;">PROVERBS 24:5-6</div>
@@ -163,16 +163,24 @@
     // Closing Slide (Slide 46)
     else if (slide.number === 46) {
       html = `
-        <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto; width: 100%;">
           <span class="slide-header-tag">THE END</span>
-          <h1 class="slide-title-hero" style="font-size: 3.5rem;">THANK YOU FOR LISTENING</h1>
-          <p style="font-size: 1.1rem; color: var(--text-muted); margin-top: 20px;">Shawn Garcia • Liceria & Co.</p>
+          <h1 class="slide-title-hero">THANK YOU FOR LISTENING</h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); margin-top: 16px;">Shawn Garcia • Liceria & Co.</p>
         </div>
       `;
     }
-    // Content Slides with Images & Bullets
+    // Content Slides
     else {
       const hasImage = slide.images && slide.images.length > 0;
+      let displayLines = [];
+      if (slide.bullets && slide.bullets.length > 0) {
+        displayLines = slide.bullets;
+      } else if (slide.raw_text) {
+        displayLines = slide.raw_text.split('\n').map(l => l.trim()).filter(l => l && !/^\d+$/.test(l));
+      }
+
+      const bulletsHtml = displayLines.map(b => `<div class="slide-bullet-item"><span class="bullet-icon">✦</span><span>${b}</span></div>`).join('');
 
       if (hasImage) {
         html = `
@@ -181,7 +189,7 @@
             <div>
               <h2 class="slide-main-title">${slide.title}</h2>
               <div class="slide-bullets-list">
-                ${slide.bullets.map(b => `<div class="slide-bullet-item"><span>${b}</span></div>`).join('')}
+                ${bulletsHtml}
               </div>
             </div>
             <div class="slide-image-box">
@@ -194,7 +202,7 @@
           <span class="slide-header-tag">${slide.tag} • SLIDE ${slide.number}</span>
           <h2 class="slide-main-title">${slide.title}</h2>
           <div class="slide-bullets-list">
-            ${slide.bullets.map(b => `<div class="slide-bullet-item"><span>${b}</span></div>`).join('')}
+            ${bulletsHtml}
           </div>
         `;
       }
