@@ -85,6 +85,15 @@
 
   // Initialize Application
   function init() {
+    // Clear legacy cached edits from earlier broken versions
+    const CURRENT_DECK_VERSION = 'v2_titles_accurate_fixed';
+    if (localStorage.getItem('deck_version') !== CURRENT_DECK_VERSION) {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('slide_edit_')) localStorage.removeItem(key);
+      });
+      localStorage.setItem('deck_version', CURRENT_DECK_VERSION);
+    }
+
     if (totalSlidesText) totalSlidesText.textContent = totalSlides;
     if (slideInput) slideInput.max = totalSlides;
 
