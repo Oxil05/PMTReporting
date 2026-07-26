@@ -86,7 +86,7 @@
   // Initialize Application
   function init() {
     // Clear legacy cached edits from earlier broken versions
-    const CURRENT_DECK_VERSION = 'v2_titles_accurate_fixed';
+    const CURRENT_DECK_VERSION = 'v3_bible_verse_fixed';
     if (localStorage.getItem('deck_version') !== CURRENT_DECK_VERSION) {
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('slide_edit_')) localStorage.removeItem(key);
@@ -174,13 +174,20 @@
     }
     // Bible Verse Slide (Slide 45)
     else if (slide.number === 45) {
+      const verseText = (slide.paragraphs && slide.paragraphs[0])
+        ? slide.paragraphs[0]
+        : "“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”";
+      const citation = slide.citation || "PROVERBS 24:5-6";
+
       html = `
-        <div style="text-align: center; max-width: 800px; margin: 0 auto; padding: 24px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid var(--border-mint); width: 100%;">
+        <div style="text-align: center; max-width: 850px; margin: 0 auto; padding: 32px 24px; background: rgba(0,0,0,0.35); border-radius: 16px; border: 1px solid var(--border-mint); width: 100%;">
           <span class="slide-header-tag editable-target" data-field="tag">BIBLE VERSE</span>
-          <h2 class="editable-target" data-field="title" style="font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.8rem); color: #fff; line-height: 1.6; margin-bottom: 16px;">
-            ${slide.title || '“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”'}
-          </h2>
-          <div class="editable-target" data-field="citation" style="font-size: 1.1rem; color: var(--primary-mint); font-weight: 800; letter-spacing: 0.05em;">${slide.citation || 'PROVERBS 24:5-6'}</div>
+          <blockquote class="editable-target" data-field="verse" style="font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.85rem); color: #ffffff; line-height: 1.6; margin: 20px 0; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+            ${verseText}
+          </blockquote>
+          <div class="editable-target" data-field="citation" style="font-size: clamp(1.1rem, 2vw, 1.35rem); color: var(--primary-mint); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;">
+            ${citation}
+          </div>
         </div>
       `;
     }

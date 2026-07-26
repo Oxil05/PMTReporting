@@ -466,7 +466,8 @@ curated_slides = [
     {
         'number': 45,
         'tag': 'BIBLE VERSE',
-        'title': 'PROVERBS 24:5-6',
+        'title': 'BIBLE VERSE',
+        'citation': 'PROVERBS 24:5-6',
         'paragraphs': [
             "“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”"
         ]
