@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Instructional Material & Strategies - Fully Responsive Slide Deck
+   Instructional Material & Strategies - Instant 0ms Responsive Slide Deck
    ========================================================================== */
 
 :root {
@@ -61,7 +61,7 @@ html, body {
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg, var(--primary-mint), var(--primary-gold));
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.2s linear;
   box-shadow: 0 0 10px var(--primary-mint);
 }
 
@@ -157,7 +157,7 @@ html, body {
   border-color: var(--primary-mint);
 }
 
-/* Presentation Stage & Responsive Slide Frame */
+/* Presentation Stage & Slide Frame */
 .stage {
   position: absolute;
   top: calc(var(--header-height) + 4px);
@@ -185,7 +185,6 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
 
 .slide-body {
@@ -197,6 +196,16 @@ html, body {
   justify-content: center;
   position: relative;
   overflow-y: auto;
+}
+
+/* Entrance Animation on Slide Change */
+@keyframes slideFadeIn {
+  from { opacity: 0.5; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-body.slide-animate {
+  animation: slideFadeIn 0.15s ease-out;
 }
 
 /* Navigation Side Arrows */
@@ -283,10 +292,7 @@ html, body {
 .counter-box input:focus { outline: none; }
 .total-text { font-size: 0.8rem; color: var(--text-muted); }
 
-.select-box { display: flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 0 8px; border-radius: 8px; height: 38px; }
-.select-label { font-size: 0.75rem; color: var(--text-muted); }
-.select-box select, .speed-select { background: transparent; border: none; color: var(--text-main); font-size: 0.82rem; cursor: pointer; }
-.speed-select { height: 38px; padding: 0 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); }
+.speed-select { height: 38px; padding: 0 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 0.82rem; cursor: pointer; }
 
 /* Presenter Panel */
 .presenter-panel {
@@ -368,19 +374,12 @@ html, body {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
 
-/* Transitions */
-.transition-fade .slide-frame.changing { opacity: 0; }
-.transition-slide .slide-frame.changing-next { transform: translateX(60px); opacity: 0; }
-.transition-slide .slide-frame.changing-prev { transform: translateX(-60px); opacity: 0; }
-.transition-zoom .slide-frame.changing { transform: scale(0.92); opacity: 0; }
-.transition-flip .slide-frame.changing { transform: rotateY(90deg); opacity: 0; }
-
 /* Responsive Media Queries */
 @media (max-width: 768px) {
   .slide-split-grid { grid-template-columns: 1fr; gap: 16px; }
   .deck-title { display: none; }
   .header-btn span { display: none; }
-  .select-box, .speed-select { display: none; }
+  .speed-select { display: none; }
   .nav-arrow.left { left: 4px; }
   .nav-arrow.right { right: 4px; }
 }

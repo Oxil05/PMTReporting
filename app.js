@@ -1,5 +1,5 @@
 /**
- * Instructional Material & Strategies - Fully Responsive Slide Deck Controller
+ * Instructional Material & Strategies - Instant 0ms Slide Deck Controller
  */
 
 (function () {
@@ -44,7 +44,6 @@
   const btnHelp = document.getElementById('btnHelp');
   const btnAutoplay = document.getElementById('btnAutoplay');
   const autoplaySpeed = document.getElementById('autoplaySpeed');
-  const transitionSelect = document.getElementById('transitionSelect');
 
   // Drawing Canvas
   const drawingCanvas = document.getElementById('drawingCanvas');
@@ -83,56 +82,29 @@
     if (slideInput) slideInput.max = totalSlides;
 
     renderGridItems();
-    goToSlide(0, 'next', false); // Render initial slide without animation lock
+    goToSlide(0);
 
     setupEventListeners();
     resizeCanvas();
   }
 
-  // Go to Slide Function with Fail-Safe Cleanup
-  function goToSlide(index, direction = 'next', animate = true) {
+  // Go to Slide Function - Instant 0ms Slide Navigation
+  function goToSlide(index) {
     if (index < 0) index = 0;
     if (index >= totalSlides) index = totalSlides - 1;
 
     currentIndex = index;
 
-    const transitionType = (transitionSelect && transitionSelect.value) ? transitionSelect.value : 'transition-slide';
-    document.body.className = `${transitionType} ${isDrawingMode ? 'drawing-mode' : ''}`;
-
-    if (animate) {
-      if (direction === 'next') {
-        slideFrame.classList.add('changing-next', 'changing');
-      } else {
-        slideFrame.classList.add('changing-prev', 'changing');
-      }
-
-      setTimeout(() => {
-        try {
-          renderSlideContent(currentIndex);
-          updateControls();
-        } catch (err) {
-          console.error('Slide render error:', err);
-        } finally {
-          slideFrame.classList.remove('changing-next', 'changing-prev', 'changing');
-        }
-      }, 120);
-    } else {
-      try {
-        renderSlideContent(currentIndex);
-        updateControls();
-      } catch (err) {
-        console.error('Slide render error:', err);
-      } finally {
-        slideFrame.classList.remove('changing-next', 'changing-prev', 'changing');
-      }
+    // Render Slide Content INSTANTLY (0ms)
+    try {
+      renderSlideContent(currentIndex);
+    } catch (err) {
+      console.error('Slide render error:', err);
     }
-  }
 
-  // Update Controls State
-  function updateControls() {
+    // Update Controls & Counters
     if (slideInput) slideInput.value = currentIndex + 1;
     
-    // Progress Bar
     if (progressBarFill && totalSlides > 0) {
       const progress = ((currentIndex + 1) / totalSlides) * 100;
       progressBarFill.style.width = `${progress}%`;
@@ -141,6 +113,13 @@
     clearCanvas();
     updatePresenterView();
     updateGridHighlight();
+
+    // Trigger subtle entrance animation on slideBody
+    if (slideBody) {
+      slideBody.classList.remove('slide-animate');
+      void slideBody.offsetWidth; // Reflow
+      slideBody.classList.add('slide-animate');
+    }
   }
 
   // Render HTML Slide Content
@@ -216,7 +195,7 @@
               </div>
             </div>
             <div class="slide-image-box">
-              <img src="${slide.images[0]}" alt="${slide.title}">
+              <img src="${slide.images[0]}" alt="${slide.title}" decoding="async" loading="lazy">
             </div>
           </div>
         `;
@@ -321,8 +300,8 @@
     if (isAutoplay) {
       const speed = autoplaySpeed ? parseInt(autoplaySpeed.value, 10) : 5000;
       autoplayTimer = setInterval(() => {
-        if (currentIndex < totalSlides - 1) goToSlide(currentIndex + 1, 'next');
-        else goToSlide(0, 'next');
+        if (currentIndex < totalSlides - 1) goToSlide(currentIndex + 1);
+        else goToSlide(0);
       }, speed);
     } else {
       if (autoplayTimer) {
@@ -418,17 +397,17 @@
     touchEndX = e.changedTouches[0].screenX;
     const diff = touchEndX - touchStartX;
     if (Math.abs(diff) > 50) {
-      if (diff < 0) goToSlide(currentIndex + 1, 'next');
-      else goToSlide(currentIndex - 1, 'prev');
+      if (diff < 0) goToSlide(currentIndex + 1);
+      else goToSlide(currentIndex - 1);
     }
   }
 
   // Event Listeners Setup
   function setupEventListeners() {
-    if (btnNext) btnNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
-    if (btnPrev) btnPrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
-    if (btnSideNext) btnSideNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
-    if (btnSidePrev) btnSidePrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
+    if (btnNext) btnNext.addEventListener('click', () => goToSlide(currentIndex + 1));
+    if (btnPrev) btnPrev.addEventListener('click', () => goToSlide(currentIndex - 1));
+    if (btnSideNext) btnSideNext.addEventListener('click', () => goToSlide(currentIndex + 1));
+    if (btnSidePrev) btnSidePrev.addEventListener('click', () => goToSlide(currentIndex - 1));
 
     if (slideInput) {
       slideInput.addEventListener('change', (e) => {
@@ -495,12 +474,12 @@
         case 'Space':
         case 'PageDown':
           e.preventDefault();
-          goToSlide(currentIndex + 1, 'next');
+          goToSlide(currentIndex + 1);
           break;
         case 'ArrowLeft':
         case 'PageUp':
           e.preventDefault();
-          goToSlide(currentIndex - 1, 'prev');
+          goToSlide(currentIndex - 1);
           break;
         case 'Home': goToSlide(0); break;
         case 'End': goToSlide(totalSlides - 1); break;
