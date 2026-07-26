@@ -176,7 +176,7 @@
       let displayParas = slide.paragraphs || [];
 
       if (!displayParas.length && slide.raw_text) {
-        displayParas = [slide.raw_text.replace(/\n+/g, ' ').replace(/\s+/g, ' ').strip()];
+        displayParas = [slide.raw_text.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()];
       }
 
       const contentHtml = displayParas.map(p => {
