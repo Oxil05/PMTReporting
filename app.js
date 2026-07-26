@@ -1,425 +1,487 @@
 /**
- * EduStrategy Hub - Interactive Static Web Application Controller
+ * Instructional Material & Strategies - Interactive HTML Slide Deck Controller
  */
 
 (function () {
   'use strict';
 
-  // Quiz Data (5 Questions based on Presentation Content)
-  const QUIZ_QUESTIONS = [
-    {
-      question: "Which teaching method involves a teacher modeling a skill first with a concrete example, followed by student practice?",
-      options: [
-        "A. Lecture Method",
-        "B. Demonstration / Performance Method",
-        "C. Case Study Method",
-        "D. Role Playing Method"
-      ],
-      correct: 1,
-      explanation: "Demonstration/Performance method starts with the teacher illustrating a general principle using a real example (modeling), after which students practice that same skill."
-    },
-    {
-      question: "What are the 3 General Techniques of Teaching?",
-      options: [
-        "A. Lecture, Group Work, and Field Trip",
-        "B. Question & Answer, Drill, and Appreciation",
-        "C. Direct Instruction, Inquiry, and Assessment",
-        "D. Material Devices, Mental Devices, and Replicas"
-      ],
-      correct: 1,
-      explanation: "The 3 general techniques are Question & Answer (Knowledge focus), Drill (Skill & Habits focus), and Appreciation (Attitude focus)."
-    },
-    {
-      question: "Which instructional strategy encourages students to explore ideas, ask questions, and discover answers on their own?",
-      options: [
-        "A. Direct Instruction",
-        "B. Collaborative Learning",
-        "C. Inquiry-Based Learning",
-        "D. Differentiated Instruction"
-      ],
-      correct: 2,
-      explanation: "Inquiry-Based Learning prompts students to discover answers independently through project-based learning, research, and experiments."
-    },
-    {
-      question: "What type of teaching method recreates real conditions using models when actual experimentation is too dangerous or expensive?",
-      options: [
-        "A. Field Studies",
-        "B. Simulation",
-        "C. Discussion",
-        "D. Small Group Work"
-      ],
-      correct: 1,
-      explanation: "Simulation recreates real-world conditions in a safe, controlled environment when actual testing is dangerous or costly (e.g. virtual labs)."
-    },
-    {
-      question: "What is the primary role of an educational device in a classroom?",
-      options: [
-        "A. To completely replace the teacher's lesson procedure",
-        "B. To act as a teaching aid that facilitates instruction and captures student attention",
-        "C. To serve as the ultimate goal of the lesson",
-        "D. Only to provide entertainment to students"
-      ],
-      correct: 1,
-      explanation: "A device is a teaching aid/tool that facilitates instruction, captures attention, and aids comprehension. It is a means to an end, never a substitute for teaching."
-    }
-  ];
+  // State Management
+  let currentIndex = 0; // 0-indexed
+  const totalSlides = DECK_SLIDES.length;
+  let isAutoplay = false;
+  let autoplayTimer = null;
+  let isLaserActive = false;
+  let isDrawingMode = false;
+  let isBlackout = false;
+  let isWhiteout = false;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let currentPenColor = '#ff4757';
+  let currentPenSize = 4;
+  let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
 
-  // Deep-dive Modal content for 8 methods
-  const METHOD_DETAILS = {
-    'modal-lecture': {
-      title: 'A. Lecture Method',
-      badge: 'Direct Instruction',
-      image: 'assets/images/img_slide_07_1.jpeg',
-      description: 'An oral presentation by an expert designed to clarify information to a large group in a short period of time.',
-      points: [
-        'Resorts to tackling special topics requiring domain expertise.',
-        'Efficient delivery for large audiences in limited time.',
-        'Best paired with interactive follow-up Q&A sessions.'
-      ]
-    },
-    'modal-demo': {
-      title: 'B. Demonstration / Performance',
-      badge: 'Skill Modeling',
-      image: 'assets/images/img_slide_08_1.jpeg',
-      description: 'The teacher illustrates a general principle using a concrete, real example, modeling the skill first before students practice.',
-      points: [
-        'Scaffolds learning through step-by-step physical or visual modeling.',
-        'Encourages immediate hands-on performance by students.',
-        'High retention rate through observation and direct practice.'
-      ]
-    },
-    'modal-discussion': {
-      title: 'C. Discussion Method',
-      badge: 'Interactive Dialogue',
-      image: 'assets/images/img_slide_09_1.png',
-      description: 'A free, two-way exchange between teacher and students for exploring attitudes, interpretations, questions, and opinions.',
-      points: [
-        'Moves beyond one-way lectures into deep collaborative discourse.',
-        'Helps uncover student perspectives, values, and critical thinking.',
-        'Requires strong teacher moderation to keep discourse focused.'
-      ]
-    },
-    'modal-casestudy': {
-      title: 'D. Case Study',
-      badge: 'Real-World Analysis',
-      image: 'assets/images/img_slide_10_1.jpeg',
-      description: 'An in-depth investigation of a single subject, group, organization, or event in its real-world context.',
-      points: [
-        'Aims at applying general principles to complex specific scenarios.',
-        'Develops analytical, diagnostic, and decision-making skills.',
-        'Widely used in business, science, social studies, and ethics.'
-      ]
-    },
-    'modal-groupwork': {
-      title: 'E. Pairs or Small Group Work',
-      badge: 'Peer Collaboration',
-      image: 'assets/images/img_slide_11_1.jpeg',
-      description: 'Students work in pairs or small groups on problems of application and analysis.',
-      points: [
-        'Integrated into larger course structures to boost engagement.',
-        'Promotes peer scaffolding and teamwork communication.',
-        'Drives collective problem-solving and critical debate.'
-      ]
-    },
-    'modal-fieldstudies': {
-      title: 'F. Field Studies',
-      badge: 'Out-of-Classroom',
-      image: 'assets/images/img_slide_12_1.jpeg',
-      description: 'Out-of-the-classroom activity intended to present concepts in the most realistic natural manner (e.g. Field Trips).',
-      points: [
-        'Qualitative research method collecting data in real-world settings.',
-        'Bridges abstract textbook concepts with authentic physical reality.',
-        'Enhances observational and qualitative recording skills.'
-      ]
-    },
-    'modal-simulation': {
-      title: 'G. Simulation',
-      badge: 'Controlled Modeling',
-      image: 'assets/images/img_slide_13_1.jpeg',
-      description: 'Imitation of a real process or concept using mathematical or virtual models to recreate conditions and test outcomes.',
-      points: [
-        'Used when actual experimentation is too dangerous, costly, or impossible.',
-        'Allows safe trial-and-error in virtual labs or gaming environments.',
-        'Predicts outcomes under varied controlled conditions.'
-      ]
-    },
-    'modal-roleplaying': {
-      title: 'H. Role Playing',
-      badge: 'Dramatic Enactment',
-      image: 'assets/images/img_slide_14_1.jpeg',
-      description: 'Action-filled enactment by students of learning episodes depicting real interpersonal or historical situations.',
-      points: [
-        'Builds deep emotional empathy and situational awareness.',
-        'Engages visual, auditory, and kinesthetic learners.',
-        'Provides memorable experiential learning opportunities.'
-      ]
-    }
-  };
+  // DOM Elements
+  const stage = document.getElementById('stage');
+  const slideFrame = document.getElementById('slideFrame');
+  const slideBody = document.getElementById('slideBody');
+  const currentSlideTag = document.getElementById('currentSlideTag');
+  const slideInput = document.getElementById('slideInput');
+  const totalSlidesText = document.getElementById('totalSlidesText');
+  const progressBarFill = document.getElementById('progressBarFill');
 
-  // State Variables
-  let currentQuizIndex = 0;
-  let quizScore = 0;
+  // Controls & Modals
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnSidePrev = document.getElementById('btnSidePrev');
+  const btnSideNext = document.getElementById('btnSideNext');
+  const btnFullscreen = document.getElementById('btnFullscreen');
+  const btnGrid = document.getElementById('btnGrid');
+  const btnPresenter = document.getElementById('btnPresenter');
+  const btnDraw = document.getElementById('btnDraw');
+  const btnLaser = document.getElementById('btnLaser');
+  const btnHelp = document.getElementById('btnHelp');
+  const btnAutoplay = document.getElementById('btnAutoplay');
+  const autoplaySpeed = document.getElementById('autoplaySpeed');
+  const transitionSelect = document.getElementById('transitionSelect');
 
-  // DOM Content Loaded
-  document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initFilters();
-    initModals();
-    initAccordions();
-    initTabs();
-    initQuiz();
-    initSearch();
-    animateMetrics();
-  });
+  // Drawing Canvas
+  const drawingCanvas = document.getElementById('drawingCanvas');
+  const ctx = drawingCanvas.getContext('2d');
+  const drawingBar = document.getElementById('drawingBar');
+  const penSizeInput = document.getElementById('penSize');
+  const btnClearCanvas = document.getElementById('btnClearCanvas');
+  const btnCloseDraw = document.getElementById('btnCloseDraw');
+  const colorDots = document.querySelectorAll('.color-dot');
 
-  // Theme Switcher
-  function initTheme() {
-    const themeBtn = document.getElementById('themeToggle');
-    themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('theme-light');
-    });
+  // Laser & Overlay
+  const laserPointer = document.getElementById('laserPointer');
+  const screenOverlay = document.getElementById('screenOverlay');
+  const overlayMsg = document.getElementById('overlayMsg');
+
+  // Presenter Notes
+  const presenterPanel = document.getElementById('presenterPanel');
+  const btnClosePresenter = document.getElementById('btnClosePresenter');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const btnTimerStart = document.getElementById('btnTimerStart');
+  const btnTimerReset = document.getElementById('btnTimerReset');
+  const notesTitle = document.getElementById('notesTitle');
+  const notesText = document.getElementById('notesText');
+  const nextSlideTitle = document.getElementById('nextSlideTitle');
+
+  // Modals
+  const gridModal = document.getElementById('gridModal');
+  const btnCloseGrid = document.getElementById('btnCloseGrid');
+  const gridContainer = document.getElementById('gridContainer');
+  const helpModal = document.getElementById('helpModal');
+  const btnCloseHelp = document.getElementById('btnCloseHelp');
+
+  // Initialize Application
+  function init() {
+    totalSlidesText.textContent = totalSlides;
+    slideInput.max = totalSlides;
+
+    renderGridItems();
+    goToSlide(0);
+
+    setupEventListeners();
+    resizeCanvas();
   }
 
-  // Filter Buttons for Methods Grid
-  function initFilters() {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const methodCards = document.querySelectorAll('.method-card');
+  // Go to Slide Function
+  function goToSlide(index, direction = 'next') {
+    if (index < 0) index = 0;
+    if (index >= totalSlides) index = totalSlides - 1;
 
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    currentIndex = index;
 
-        const filter = btn.getAttribute('data-filter');
-        methodCards.forEach(card => {
-          const category = card.getAttribute('data-category');
-          if (filter === 'all' || filter === category) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    });
-  }
+    // Apply Transition Animation
+    const transitionType = transitionSelect.value || 'transition-slide';
+    document.body.className = `${transitionType} ${isDrawingMode ? 'drawing-mode' : ''}`;
 
-  // Method Detail Modals
-  function initModals() {
-    const detailModal = document.getElementById('detailModal');
-    const modalBody = document.getElementById('detailModalBody');
-    const btnClose = document.getElementById('btnCloseDetailModal');
-    const actionBtns = document.querySelectorAll('.card-action-btn');
-
-    actionBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const modalKey = btn.getAttribute('data-modal');
-        const data = METHOD_DETAILS[modalKey];
-
-        if (data) {
-          modalBody.innerHTML = `
-            <div class="modal-detail-header" style="margin-bottom: 20px;">
-              <span class="section-badge">${data.badge}</span>
-              <h2 style="font-size: 1.8rem; margin-top: 6px;">${data.title}</h2>
-            </div>
-            <img src="${data.image}" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 20px;">
-            <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">${data.description}</p>
-            <h4 style="font-size: 1rem; color: var(--primary-mint); margin-bottom: 10px;">Key Takeaways:</h4>
-            <ul style="padding-left: 20px; color: var(--text-muted); font-size: 0.9rem;">
-              ${data.points.map(p => `<li style="margin-bottom: 8px;">${p}</li>`).join('')}
-            </ul>
-          `;
-          detailModal.classList.add('active');
-        }
-      });
-    });
-
-    btnClose.addEventListener('click', () => detailModal.classList.remove('active'));
-    detailModal.addEventListener('click', (e) => {
-      if (e.target === detailModal) detailModal.classList.remove('active');
-    });
-  }
-
-  // Accordions
-  function initAccordions() {
-    const headers = document.querySelectorAll('.accordion-header');
-    headers.forEach(header => {
-      header.addEventListener('click', () => {
-        const item = header.parentElement;
-        item.classList.toggle('active');
-      });
-    });
-  }
-
-  // Strategy Tabs
-  function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabPanes.forEach(p => p.classList.remove('active'));
-
-        btn.classList.add('active');
-        const targetId = btn.getAttribute('data-tab');
-        document.getElementById(targetId).classList.add('active');
-      });
-    });
-  }
-
-  // Interactive Quiz Logic
-  function initQuiz() {
-    const quizQuestionNumber = document.getElementById('quizQuestionNumber');
-    const quizScoreCount = document.getElementById('quizScoreCount');
-    const quizQuestionText = document.getElementById('quizQuestionText');
-    const quizOptionsList = document.getElementById('quizOptionsList');
-    const quizFeedback = document.getElementById('quizFeedback');
-    const quizFeedbackTitle = document.getElementById('quizFeedbackTitle');
-    const quizFeedbackText = document.getElementById('quizFeedbackText');
-    const btnNextQuestion = document.getElementById('btnNextQuestion');
-    const quizProgressFill = document.getElementById('quizProgressFill');
-    const quizCard = document.getElementById('quizCard');
-    const quizResultCard = document.getElementById('quizResultCard');
-    const btnRestartQuiz = document.getElementById('btnRestartQuiz');
-
-    function loadQuestion() {
-      const q = QUIZ_QUESTIONS[currentQuizIndex];
-      quizQuestionNumber.textContent = `Question ${currentQuizIndex + 1} of ${QUIZ_QUESTIONS.length}`;
-      quizScoreCount.textContent = `Score: ${quizScore}`;
-      quizQuestionText.textContent = q.question;
-
-      quizProgressFill.style.width = `${((currentQuizIndex + 1) / QUIZ_QUESTIONS.length) * 100}%`;
-
-      quizOptionsList.innerHTML = '';
-      quizFeedback.style.display = 'none';
-      btnNextQuestion.style.display = 'none';
-
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.innerHTML = `<span>${opt}</span>`;
-        btn.addEventListener('click', () => selectAnswer(idx, q));
-        quizOptionsList.appendChild(btn);
-      });
+    if (direction === 'next') {
+      slideFrame.classList.add('changing-next', 'changing');
+    } else {
+      slideFrame.classList.add('changing-prev', 'changing');
     }
 
-    function selectAnswer(selectedIndex, q) {
-      const options = quizOptionsList.querySelectorAll('.quiz-option');
-      options.forEach(opt => opt.style.pointerEvents = 'none');
+    setTimeout(() => {
+      renderSlideContent(currentIndex);
+      slideInput.value = currentIndex + 1;
+      
+      // Update Progress Bar
+      const progress = ((currentIndex + 1) / totalSlides) * 100;
+      progressBarFill.style.width = `${progress}%`;
 
-      if (selectedIndex === q.correct) {
-        options[selectedIndex].classList.add('correct');
-        quizScore++;
-        quizFeedbackTitle.textContent = 'Correct!';
-        quizFeedbackTitle.style.color = 'var(--primary-emerald)';
-      } else {
-        options[selectedIndex].classList.add('incorrect');
-        options[q.correct].classList.add('correct');
-        quizFeedbackTitle.textContent = 'Incorrect!';
-        quizFeedbackTitle.style.color = '#ff4757';
-      }
+      // Clear Canvas
+      clearCanvas();
 
-      quizFeedbackText.textContent = q.explanation;
-      quizFeedback.style.display = 'block';
-      btnNextQuestion.style.display = 'inline-flex';
-      quizScoreCount.textContent = `Score: ${quizScore}`;
-    }
+      // Update Presenter Panel & Grid Highlight
+      updatePresenterView();
+      updateGridHighlight();
 
-    btnNextQuestion.addEventListener('click', () => {
-      currentQuizIndex++;
-      if (currentQuizIndex < QUIZ_QUESTIONS.length) {
-        loadQuestion();
-      } else {
-        showResults();
-      }
-    });
-
-    function showResults() {
-      quizCard.style.display = 'none';
-      quizResultCard.style.display = 'block';
-      document.getElementById('resultScoreText').textContent = `You scored ${quizScore} out of ${QUIZ_QUESTIONS.length}`;
-    }
-
-    btnRestartQuiz.addEventListener('click', () => {
-      currentQuizIndex = 0;
-      quizScore = 0;
-      quizResultCard.style.display = 'none';
-      quizCard.style.display = 'block';
-      loadQuestion();
-    });
-
-    loadQuestion();
-  }
-
-  // Global Search Dropdown
-  function initSearch() {
-    const searchInput = document.getElementById('globalSearchInput');
-    const searchDropdown = document.getElementById('searchDropdown');
-
-    const searchData = [
-      { title: 'Lecture Method', sec: '#methods', snippet: 'Oral presentation by an expert to clarify information.' },
-      { title: 'Demonstration / Performance', sec: '#methods', snippet: 'Modeling a skill first with real concrete examples.' },
-      { title: 'Discussion Method', sec: '#methods', snippet: 'Two-way exchange of attitudes and opinions.' },
-      { title: 'Case Study', sec: '#methods', snippet: 'In-depth real-world investigation of a subject.' },
-      { title: 'Field Studies & Field Trips', sec: '#methods', snippet: 'Out-of-classroom qualitative research activity.' },
-      { title: 'Simulation Games & Virtual Labs', sec: '#methods', snippet: 'Recreating real conditions in controlled environments.' },
-      { title: 'Role Playing', sec: '#methods', snippet: 'Dramatic enactment of learning situations.' },
-      { title: 'Question & Answer Technique', sec: '#techniques', snippet: 'Knowledge-focused general technique.' },
-      { title: 'Drill Method Technique', sec: '#techniques', snippet: 'Skill & habit reinforcement technique.' },
-      { title: 'Direct Instruction', sec: '#strategies', snippet: 'Explicit teaching, think-alouds, and guided practice.' },
-      { title: 'Collaborative Learning', sec: '#strategies', snippet: 'Think-Pair-Share, jigsaw, and group projects.' },
-      { title: 'Inquiry-Based Learning', sec: '#strategies', snippet: 'Student-driven exploration and Socratic seminars.' },
-      { title: 'Differentiated Instruction', sec: '#strategies', snippet: 'Tiered assignments and choice boards.' },
-      { title: 'Educational Devices & Tools', sec: '#devices', snippet: 'Material, mental, and electronic teaching aids.' }
-    ];
-
-    searchInput.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      if (!q) {
-        searchDropdown.classList.remove('active');
-        return;
-      }
-
-      const matches = searchData.filter(d => d.title.toLowerCase().includes(q) || d.snippet.toLowerCase().includes(q));
-
-      if (matches.length === 0) {
-        searchDropdown.innerHTML = `<div style="padding: 12px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">No matches found</div>`;
-      } else {
-        searchDropdown.innerHTML = matches.map(m => `
-          <div class="search-result-row" onclick="location.href='${m.sec}'">
-            <h5>${m.title}</h5>
-            <p>${m.snippet}</p>
-          </div>
-        `).join('');
-      }
-
-      searchDropdown.classList.add('active');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
-        searchDropdown.classList.remove('active');
-      }
-    });
-  }
-
-  // Metrics Animated Counters
-  function animateMetrics() {
-    const counters = document.querySelectorAll('.metric-num');
-    counters.forEach(counter => {
-      const target = parseInt(counter.getAttribute('data-target'), 10);
-      let current = 0;
-      const step = Math.max(1, Math.floor(target / 20));
-      const timer = setInterval(() => {
-        current += step;
-        if (current >= target) {
-          counter.textContent = target;
-          clearInterval(timer);
-        } else {
-          counter.textContent = current;
-        }
+      setTimeout(() => {
+        slideFrame.classList.remove('changing-next', 'changing-prev', 'changing');
       }, 50);
+    }, 150);
+  }
+
+  // Render HTML Slide Content
+  function renderSlideContent(idx) {
+    const slide = DECK_SLIDES[idx];
+    currentSlideTag.textContent = slide.tag;
+
+    let html = '';
+
+    // Title Slide (Slide 1)
+    if (slide.number === 1) {
+      html = `
+        <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+          <span class="slide-header-tag">${slide.tag}</span>
+          <h1 class="slide-title-hero">INSTRUCTIONAL MATERIAL / STRATEGY OF TEACHING</h1>
+          <p class="slide-subtitle">A Comprehensive Guide to Methods, Techniques, Strategies & Educational Devices</p>
+          <div style="margin-top: 30px; display: inline-flex; gap: 20px; background: rgba(0,0,0,0.3); padding: 12px 24px; border-radius: 30px; border: 1px solid var(--border-mint);">
+            <span style="font-size: 0.9rem; color: var(--primary-mint); font-weight: 700;">Presenter: Shawn Garcia | Liceria & Co.</span>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">2026 February 9</span>
+          </div>
+        </div>
+      `;
+    }
+    // Bible Verse Slide (Slide 45)
+    else if (slide.number === 45) {
+      html = `
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; padding: 30px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid var(--border-mint);">
+          <span class="slide-header-tag">BIBLE VERSE</span>
+          <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff; line-height: 1.6; margin-bottom: 20px;">
+            “A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”
+          </h2>
+          <div style="font-size: 1.1rem; color: var(--primary-mint); font-weight: 800; letter-spacing: 0.05em;">PROVERBS 24:5-6</div>
+        </div>
+      `;
+    }
+    // Closing Slide (Slide 46)
+    else if (slide.number === 46) {
+      html = `
+        <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+          <span class="slide-header-tag">THE END</span>
+          <h1 class="slide-title-hero" style="font-size: 3.5rem;">THANK YOU FOR LISTENING</h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); margin-top: 20px;">Shawn Garcia • Liceria & Co.</p>
+        </div>
+      `;
+    }
+    // Content Slides with Images & Bullets
+    else {
+      const hasImage = slide.images && slide.images.length > 0;
+
+      if (hasImage) {
+        html = `
+          <span class="slide-header-tag">${slide.tag} • SLIDE ${slide.number}</span>
+          <div class="slide-split-grid">
+            <div>
+              <h2 class="slide-main-title">${slide.title}</h2>
+              <div class="slide-bullets-list">
+                ${slide.bullets.map(b => `<div class="slide-bullet-item"><span>${b}</span></div>`).join('')}
+              </div>
+            </div>
+            <div class="slide-image-box">
+              <img src="${slide.images[0]}" alt="${slide.title}">
+            </div>
+          </div>
+        `;
+      } else {
+        html = `
+          <span class="slide-header-tag">${slide.tag} • SLIDE ${slide.number}</span>
+          <h2 class="slide-main-title">${slide.title}</h2>
+          <div class="slide-bullets-list">
+            ${slide.bullets.map(b => `<div class="slide-bullet-item"><span>${b}</span></div>`).join('')}
+          </div>
+        `;
+      }
+    }
+
+    slideBody.innerHTML = html;
+  }
+
+  // Update Presenter Notes
+  function updatePresenterView() {
+    const slide = DECK_SLIDES[currentIndex];
+    notesTitle.textContent = `Slide ${slide.number}: ${slide.title}`;
+    notesText.textContent = slide.raw_text || 'No speaker notes for this slide.';
+
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < totalSlides) {
+      nextSlideTitle.textContent = `Slide ${DECK_SLIDES[nextIndex].number}: ${DECK_SLIDES[nextIndex].title}`;
+    } else {
+      nextSlideTitle.textContent = 'End of presentation';
+    }
+  }
+
+  // Timer Controls
+  function toggleTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      btnTimerStart.textContent = 'Start';
+    } else {
+      btnTimerStart.textContent = 'Pause';
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(timerSeconds % 60).padStart(2, '0');
+        timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
+      }, 1000);
+    }
+  }
+
+  function resetTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerSeconds = 0;
+    timerDisplay.textContent = '00:00:00';
+    btnTimerStart.textContent = 'Start';
+  }
+
+  // Render Grid Overview Items
+  function renderGridItems() {
+    gridContainer.innerHTML = '';
+    DECK_SLIDES.forEach((slide, idx) => {
+      const item = document.createElement('div');
+      item.className = `grid-item ${idx === currentIndex ? 'active' : ''}`;
+      item.setAttribute('data-index', idx);
+      item.innerHTML = `
+        <div class="grid-num">SLIDE ${slide.number}</div>
+        <div class="grid-title">${slide.title}</div>
+      `;
+
+      item.addEventListener('click', () => {
+        goToSlide(idx);
+        gridModal.classList.remove('active');
+      });
+
+      gridContainer.appendChild(item);
     });
   }
 
+  function updateGridHighlight() {
+    const items = gridContainer.querySelectorAll('.grid-item');
+    items.forEach(item => {
+      const idx = parseInt(item.getAttribute('data-index'), 10);
+      if (idx === currentIndex) item.classList.add('active');
+      else item.classList.remove('active');
+    });
+  }
+
+  // Auto-Play Slideshow
+  function toggleAutoplay() {
+    isAutoplay = !isAutoplay;
+    btnAutoplay.classList.toggle('active', isAutoplay);
+    document.getElementById('autoplayText').textContent = isAutoplay ? 'Pause' : 'Auto Play';
+
+    if (isAutoplay) {
+      const speed = parseInt(autoplaySpeed.value, 10);
+      autoplayTimer = setInterval(() => {
+        if (currentIndex < totalSlides - 1) goToSlide(currentIndex + 1, 'next');
+        else goToSlide(0, 'next');
+      }, speed);
+    } else {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+    }
+  }
+
+  // Laser Pointer
+  function toggleLaser() {
+    isLaserActive = !isLaserActive;
+    btnLaser.classList.toggle('active', isLaserActive);
+    laserPointer.style.display = isLaserActive ? 'block' : 'none';
+    if (isLaserActive && isDrawingMode) toggleDrawingMode();
+  }
+
+  // Pen Drawing Tool
+  function toggleDrawingMode() {
+    isDrawingMode = !isDrawingMode;
+    btnDraw.classList.toggle('active', isDrawingMode);
+    drawingBar.style.display = isDrawingMode ? 'flex' : 'none';
+    document.body.classList.toggle('drawing-mode', isDrawingMode);
+    if (isDrawingMode && isLaserActive) toggleLaser();
+  }
+
+  function resizeCanvas() {
+    drawingCanvas.width = slideFrame.clientWidth;
+    drawingCanvas.height = slideFrame.clientHeight;
+  }
+
+  function startDrawing(e) {
+    if (!isDrawingMode) return;
+    isDrawing = true;
+    const rect = drawingCanvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+  }
+
+  function draw(e) {
+    if (!isDrawing || !isDrawingMode) return;
+    const rect = drawingCanvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(currentX, currentY);
+    ctx.strokeStyle = currentPenColor;
+    ctx.lineWidth = currentPenSize;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    lastX = currentX;
+    lastY = currentY;
+  }
+
+  function stopDrawing() { isDrawing = false; }
+  function clearCanvas() { ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height); }
+
+  // Blackout / Whiteout
+  function toggleBlackout() {
+    isBlackout = !isBlackout;
+    isWhiteout = false;
+    screenOverlay.className = `screen-overlay ${isBlackout ? 'active blackout' : ''}`;
+    overlayMsg.textContent = 'Screen Blackout (Press B to Resume)';
+  }
+
+  function toggleWhiteout() {
+    isWhiteout = !isWhiteout;
+    isBlackout = false;
+    screenOverlay.className = `screen-overlay ${isWhiteout ? 'active whiteout' : ''}`;
+    overlayMsg.textContent = 'Screen Whiteout (Press W to Resume)';
+  }
+
+  // Fullscreen
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => console.log(err));
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
+  }
+
+  // Touch Swipe
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  function handleTouchStart(e) { touchStartX = e.changedTouches[0].screenX; }
+  function handleTouchEnd(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 50) {
+      if (diff < 0) goToSlide(currentIndex + 1, 'next');
+      else goToSlide(currentIndex - 1, 'prev');
+    }
+  }
+
+  // Event Listeners Setup
+  function setupEventListeners() {
+    btnNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
+    btnPrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
+    btnSideNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
+    btnSidePrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
+
+    slideInput.addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (!isNaN(val)) goToSlide(val - 1);
+    });
+
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+    btnGrid.addEventListener('click', () => gridModal.classList.add('active'));
+    btnCloseGrid.addEventListener('click', () => gridModal.classList.remove('active'));
+
+    btnPresenter.addEventListener('click', () => presenterPanel.classList.toggle('active'));
+    btnClosePresenter.addEventListener('click', () => presenterPanel.classList.remove('active'));
+
+    btnHelp.addEventListener('click', () => helpModal.classList.add('active'));
+    btnCloseHelp.addEventListener('click', () => helpModal.classList.remove('active'));
+
+    btnAutoplay.addEventListener('click', toggleAutoplay);
+
+    btnLaser.addEventListener('click', toggleLaser);
+    btnDraw.addEventListener('click', toggleDrawingMode);
+    btnCloseDraw.addEventListener('click', toggleDrawingMode);
+    btnClearCanvas.addEventListener('click', clearCanvas);
+
+    penSizeInput.addEventListener('input', (e) => currentPenSize = e.target.value);
+    colorDots.forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        colorDots.forEach(d => d.classList.remove('active'));
+        e.target.classList.add('active');
+        currentPenColor = e.target.getAttribute('data-color');
+      });
+    });
+
+    drawingCanvas.addEventListener('mousedown', startDrawing);
+    drawingCanvas.addEventListener('mousemove', draw);
+    drawingCanvas.addEventListener('mouseup', stopDrawing);
+    drawingCanvas.addEventListener('mouseleave', stopDrawing);
+
+    stage.addEventListener('mousemove', (e) => {
+      if (isLaserActive) {
+        laserPointer.style.left = `${e.clientX}px`;
+        laserPointer.style.top = `${e.clientY}px`;
+      }
+    });
+
+    stage.addEventListener('touchstart', handleTouchStart, { passive: true });
+    stage.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    btnTimerStart.addEventListener('click', toggleTimer);
+    btnTimerReset.addEventListener('click', resetTimer);
+
+    window.addEventListener('resize', resizeCanvas);
+
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'Space':
+        case 'PageDown':
+          e.preventDefault();
+          goToSlide(currentIndex + 1, 'next');
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          goToSlide(currentIndex - 1, 'prev');
+          break;
+        case 'Home': goToSlide(0); break;
+        case 'End': goToSlide(totalSlides - 1); break;
+        case 'f': case 'F': toggleFullscreen(); break;
+        case 'o': case 'O': case 'g': case 'G': gridModal.classList.toggle('active'); break;
+        case 'p': case 'P': presenterPanel.classList.toggle('active'); break;
+        case 'l': case 'L': toggleLaser(); break;
+        case 'd': case 'D': toggleDrawingMode(); break;
+        case 'b': case 'B': toggleBlackout(); break;
+        case 'w': case 'W': toggleWhiteout(); break;
+        case '?': helpModal.classList.toggle('active'); break;
+        case 'Escape':
+          gridModal.classList.remove('active');
+          helpModal.classList.remove('active');
+          if (isBlackout || isWhiteout) {
+            screenOverlay.className = 'screen-overlay';
+            isBlackout = false; isWhiteout = false;
+          }
+          break;
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
