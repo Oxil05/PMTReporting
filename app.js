@@ -173,23 +173,28 @@
     // Content Slides
     else {
       const hasImage = slide.images && slide.images.length > 0;
-      let displayLines = [];
-      if (slide.bullets && slide.bullets.length > 0) {
-        displayLines = slide.bullets;
-      } else if (slide.raw_text) {
-        displayLines = slide.raw_text.split('\n').map(l => l.trim()).filter(l => l && !/^\d+$/.test(l));
+      let displayParas = slide.paragraphs || [];
+
+      if (!displayParas.length && slide.raw_text) {
+        displayParas = [slide.raw_text.replace(/\n+/g, ' ').replace(/\s+/g, ' ').strip()];
       }
 
-      const bulletsHtml = displayLines.map(b => `<div class="slide-bullet-item"><span class="bullet-icon">✦</span><span>${b}</span></div>`).join('');
+      const contentHtml = displayParas.map(p => {
+        if (/^[-•*▪]\s|^\d+\.\s/.test(p)) {
+          return `<div class="slide-paragraph-box"><span class="bullet-icon">✦</span><span>${p}</span></div>`;
+        } else {
+          return `<p class="slide-paragraph-plain">${p}</p>`;
+        }
+      }).join('');
 
       if (hasImage) {
         html = `
-          <span class="slide-header-tag">${slide.tag} • SLIDE ${slide.number}</span>
+          <span class="slide-header-tag">${slide.tag}</span>
           <div class="slide-split-grid">
             <div>
               <h2 class="slide-main-title">${slide.title}</h2>
-              <div class="slide-bullets-list">
-                ${bulletsHtml}
+              <div class="slide-text-container">
+                ${contentHtml}
               </div>
             </div>
             <div class="slide-image-box">
@@ -199,10 +204,10 @@
         `;
       } else {
         html = `
-          <span class="slide-header-tag">${slide.tag} • SLIDE ${slide.number}</span>
+          <span class="slide-header-tag">${slide.tag}</span>
           <h2 class="slide-main-title">${slide.title}</h2>
-          <div class="slide-bullets-list">
-            ${bulletsHtml}
+          <div class="slide-text-container">
+            ${contentHtml}
           </div>
         `;
       }
