@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.system_generated/
+inspect_slides.py
+process_slides.py
+extracted_slides.json

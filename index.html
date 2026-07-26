@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructional Material & Teaching Strategies - Interactive Presentation</title>
+  <meta name="description" content="Interactive web presentation deck for Instructional Material and Strategies of Teaching with presenter notes, laser pointer, drawing tools, and search.">
+  <meta name="theme-color" content="#13231b">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dark transition-fade">
+
+  <!-- Top Navigation Header (Auto-hides in presentation mode) -->
+  <header class="app-header" id="appHeader">
+    <div class="header-left">
+      <span class="brand-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+      <div class="header-title-wrap">
+        <h1 class="header-title" id="slideHeaderTitle">Instructional Material & Strategies</h1>
+        <span class="header-subtitle">Interactive PowerPoint Deck</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="btnSearch" title="Search Slides (S)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnGrid" title="Slide Overview / Grid (O)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnPresenter" title="Presenter Mode & Notes (P)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h20v14H2z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnDraw" title="Annotation / Pen Tool (D)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnLaser" title="Laser Pointer (L)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnHelp" title="Shortcuts & Help (?)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+
+      <button class="icon-btn" id="btnFullscreen" title="Toggle Fullscreen (F)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="fs-icon-open"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Drawing Sub-Toolbar (Shown when pen tool is active) -->
+  <div class="drawing-toolbar" id="drawingToolbar" style="display: none;">
+    <div class="drawing-controls">
+      <span class="tool-label">Pen Color:</span>
+      <button class="color-dot active" data-color="#ff4757" style="background:#ff4757;"></button>
+      <button class="color-dot" data-color="#2ed573" style="background:#2ed573;"></button>
+      <button class="color-dot" data-color="#1e90ff" style="background:#1e90ff;"></button>
+      <button class="color-dot" data-color="#ffa502" style="background:#ffa502;"></button>
+      <button class="color-dot" data-color="#ffffff" style="background:#ffffff;"></button>
+
+      <div class="divider"></div>
+
+      <span class="tool-label">Size:</span>
+      <input type="range" id="penSize" min="2" max="20" value="4">
+
+      <div class="divider"></div>
+
+      <button class="text-btn" id="btnClearCanvas">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Clear
+      </button>
+      <button class="text-btn close-draw" id="btnCloseDraw">Done</button>
+    </div>
+  </div>
+
+  <!-- Main Presentation Stage Area -->
+  <main class="presentation-stage" id="presentationStage">
+    
+    <!-- Laser Pointer Canvas overlay -->
+    <div class="laser-pointer" id="laserPointer"></div>
+
+    <!-- Screen Overlay for Blackout / Whiteout -->
+    <div class="screen-overlay" id="screenOverlay">
+      <div class="overlay-msg" id="overlayMsg">Screen Paused (Press B or W to Resume)</div>
+    </div>
+
+    <!-- Active Slide Stage Container -->
+    <div class="slide-container" id="slideContainer">
+      <div class="slide-wrapper" id="slideWrapper">
+        <img id="currentSlideImg" src="" alt="Presentation Slide" class="slide-image">
+        <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Clickable Navigation Hotspots -->
+    <div class="nav-hotspot left" id="hotspotPrev" title="Previous Slide">
+      <div class="hotspot-arrow">&lsaquo;</div>
+    </div>
+    <div class="nav-hotspot right" id="hotspotNext" title="Next Slide">
+      <div class="hotspot-arrow">&rsaquo;</div>
+    </div>
+  </main>
+
+  <!-- Presenter Notes & Side Panel (Collapsible) -->
+  <aside class="presenter-panel" id="presenterPanel">
+    <div class="panel-header">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Speaker Notes & Transcript
+      </h3>
+      <button class="icon-btn-sm" id="btnClosePresenter">&times;</button>
+    </div>
+
+    <div class="panel-body">
+      <!-- Presenter Timer -->
+      <div class="presenter-timer-box">
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+        <div class="timer-controls">
+          <button id="btnTimerStart" class="timer-btn">Start</button>
+          <button id="btnTimerReset" class="timer-btn">Reset</button>
+        </div>
+      </div>
+
+      <!-- Current Slide Info -->
+      <div class="slide-notes-card">
+        <h4 id="notesSlideTitle">Slide 1 Title</h4>
+        <div class="notes-content" id="notesContent">
+          Loading speaker notes...
+        </div>
+      </div>
+
+      <!-- Next Slide Preview -->
+      <div class="next-slide-preview">
+        <div class="preview-label">Next Slide Preview:</div>
+        <img id="nextSlideImg" src="" alt="Next Slide Preview" class="preview-thumb">
+        <div id="nextSlideTitle" class="preview-title">Next Slide Title</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Interactive Deck Controls -->
+  <footer class="app-footer" id="appFooter">
+    <div class="footer-left">
+      <button class="ctrl-btn" id="btnPrev" title="Previous Slide (Left Arrow)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Prev
+      </button>
+      
+      <div class="slide-counter-wrap">
+        <input type="number" id="slideInput" min="1" max="46" value="1">
+        <span class="total-count">/ <span id="totalSlidesCount">46</span></span>
+      </div>
+
+      <button class="ctrl-btn" id="btnNext" title="Next Slide (Right Arrow / Space)">
+        Next
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="footer-center">
+      <!-- Transition Selector -->
+      <div class="select-wrap" title="Slide Transition Effect">
+        <span class="select-label">Effect:</span>
+        <select id="transitionSelect">
+          <option value="transition-fade" selected>Fade</option>
+          <option value="transition-slide">Slide</option>
+          <option value="transition-zoom">Zoom</option>
+          <option value="transition-flip">Flip</option>
+        </select>
+      </div>
+
+      <!-- Auto Play Controls -->
+      <button class="ctrl-btn secondary" id="btnAutoplay" title="Start Slideshow Auto-play">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="autoplayIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="autoplayText">Auto Play</span>
+      </button>
+
+      <select id="autoplaySpeed" class="speed-select" title="Auto Play Interval">
+        <option value="3000">3s</option>
+        <option value="5000" selected>5s</option>
+        <option value="8000">8s</option>
+        <option value="10000">10s</option>
+      </select>
+    </div>
+
+    <div class="footer-right">
+      <button class="ctrl-btn secondary" id="btnOriginalPdf" title="Original PDF File">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF Source
+      </button>
+    </div>
+  </footer>
+
+  <!-- Grid / Overview Modal -->
+  <div class="modal-overlay" id="gridModal">
+    <div class="modal-card grid-modal-card">
+      <div class="modal-header">
+        <h2>Slide Gallery Overview (46 Slides)</h2>
+        <div class="modal-header-actions">
+          <input type="text" id="gridSearchInput" placeholder="Filter slides..." class="grid-search-input">
+          <button class="close-modal-btn" id="btnCloseGrid">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="slides-grid" id="slidesGridContainer">
+          <!-- Thumbnail cards dynamically injected -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal-overlay" id="searchModal">
+    <div class="modal-card search-modal-card">
+      <div class="modal-header">
+        <h2>Search Presentation Content</h2>
+        <button class="close-modal-btn" id="btnCloseSearch">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-input-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Type keywords e.g., 'Instructional', 'Demonstration', 'Role Playing'..." autofocus>
+        </div>
+        <div class="search-results-list" id="searchResultsList">
+          <div class="empty-search">Type a query above to search across all slides...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help & Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-card help-modal-card">
+      <div class="modal-header">
+        <h2>Keyboard Shortcuts & Instructions</h2>
+        <button class="close-modal-btn" id="btnCloseHelp">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcuts-grid">
+          <div class="shortcut-item">
+            <span class="key-badge">Right Arrow</span> / <span class="key-badge">Space</span>
+            <span class="key-desc">Next Slide</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">Left Arrow</span>
+            <span class="key-desc">Previous Slide</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">F</span>
+            <span class="key-desc">Toggle Fullscreen</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">O</span> / <span class="key-badge">G</span>
+            <span class="key-desc">Slide Grid Overview</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">P</span>
+            <span class="key-desc">Presenter Notes Mode</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">S</span>
+            <span class="key-desc">Search Presentation</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">L</span>
+            <span class="key-desc">Toggle Laser Pointer</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">D</span>
+            <span class="key-desc">Toggle Pen Drawing Tool</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">B</span>
+            <span class="key-desc">Blackout Screen</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">W</span>
+            <span class="key-desc">Whiteout Screen</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key-badge">Esc</span>
+            <span class="key-desc">Exit Overview / Modals</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="slides_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
