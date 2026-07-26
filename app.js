@@ -86,12 +86,10 @@
   // Initialize Application
   function init() {
     // Clear legacy cached edits from earlier versions
-    const CURRENT_DECK_VERSION = 'v4_icebreaker_bibleverse_fixed';
+    const CURRENT_DECK_VERSION = 'v5_icebreaker_centered_fixed';
     if (localStorage.getItem('deck_version') !== CURRENT_DECK_VERSION) {
       try {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('slide_edit_')) localStorage.removeItem(key);
-        });
+        localStorage.clear();
       } catch (e) {}
       localStorage.setItem('deck_version', CURRENT_DECK_VERSION);
     }
@@ -147,13 +145,21 @@
     
     // Check for saved local edit
     const savedEdit = localStorage.getItem(`slide_edit_${idx}`);
-    if (savedEdit) {
+    if (savedEdit && slide.number !== 4 && slide.number !== 45) {
       try {
         const parsed = JSON.parse(savedEdit);
         slide = { ...slide, ...parsed };
       } catch (e) {
         console.error('Failed parsing slide edit:', e);
       }
+    }
+
+    if (slide.number === 4) {
+      slide.tag = 'ICE BREAKER';
+      slide.title = 'ICE BREAKER';
+    } else if (slide.number === 45) {
+      slide.tag = 'BIBLE VERSE';
+      slide.title = 'BIBLE VERSE';
     }
 
     if (currentSlideTag) currentSlideTag.textContent = slide.tag || 'REPORTING';
@@ -174,27 +180,18 @@
         </div>
       `;
     }
-    // Ice Breaker Slide (Slide 4)
+    // Ice Breaker Slide (Slide 4) - Centered Title & Centered Full Image
     else if (slide.number === 4) {
-      const hasImage = slide.images && slide.images.length > 0;
-      if (hasImage) {
-        html = `
-          <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
-            <span class="slide-header-tag editable-target" data-field="tag">ICE BREAKER</span>
-            <h1 class="slide-title-hero editable-target" data-field="title" style="font-size: clamp(2.2rem, 5vw, 3.8rem); color: var(--primary-mint); margin-bottom: 24px;">ICE BREAKER</h1>
-            <div class="slide-image-box" style="max-height: clamp(250px, 45vh, 400px); margin: 0 auto;">
-              <img src="${slide.images[0]}" alt="Ice Breaker" decoding="async" loading="lazy">
-            </div>
+      const imgSrc = (slide.images && slide.images.length > 0) ? slide.images[0] : 'assets/images/img_slide_04_1.jpeg';
+      html = `
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0;">
+          <span class="slide-header-tag editable-target" data-field="tag" style="margin-bottom: 12px;">ICE BREAKER</span>
+          <h1 class="slide-title-hero editable-target" data-field="title" style="font-size: clamp(2rem, 5vw, 3.5rem); color: var(--primary-mint); margin-bottom: 20px; text-shadow: 0 4px 15px rgba(0,0,0,0.5);">ICE BREAKER</h1>
+          <div class="slide-image-box" style="max-width: 580px; width: 100%; max-height: clamp(240px, 45vh, 380px); margin: 0 auto; border-radius: 16px; border: 1px solid var(--border-mint); background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 10px;">
+            <img src="${imgSrc}" alt="Ice Breaker" decoding="async" loading="lazy" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; display: block;">
           </div>
-        `;
-      } else {
-        html = `
-          <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
-            <span class="slide-header-tag editable-target" data-field="tag">ICE BREAKER</span>
-            <h1 class="slide-title-hero editable-target" data-field="title" style="font-size: clamp(2.5rem, 6vw, 4.2rem); color: var(--primary-mint); margin-top: 20px;">ICE BREAKER</h1>
-          </div>
-        `;
-      }
+        </div>
+      `;
     }
     // Bible Verse Slide (Slide 45)
     else if (slide.number === 45) {
