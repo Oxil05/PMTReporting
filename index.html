@@ -3,296 +3,708 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instructional Material & Teaching Strategies - Interactive Presentation</title>
-  <meta name="description" content="Interactive web presentation deck for Instructional Material and Strategies of Teaching with presenter notes, laser pointer, drawing tools, and search.">
-  <meta name="theme-color" content="#13231b">
+  <title>Instructional Material & Strategies of Teaching - Interactive Web Guide</title>
+  <meta name="description" content="An interactive web application exploring teaching methods, techniques, strategies, educational devices, and self-assessment activities.">
+  <meta name="theme-color" content="#0d1b14">
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-dark transition-fade">
+<body class="theme-dark">
 
-  <!-- Top Navigation Header (Auto-hides in presentation mode) -->
-  <header class="app-header" id="appHeader">
-    <div class="header-left">
-      <span class="brand-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
-      <div class="header-title-wrap">
-        <h1 class="header-title" id="slideHeaderTitle">Instructional Material & Strategies</h1>
-        <span class="header-subtitle">Interactive PowerPoint Deck</span>
+  <!-- Header Navigation -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">EduStrategy</span>
+          <span class="brand-sub">Instructional Hub</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#methods" class="nav-link">Teaching Methods</a>
+        <a href="#techniques" class="nav-link">Techniques</a>
+        <a href="#strategies" class="nav-link">Strategies</a>
+        <a href="#devices" class="nav-link">Educational Devices</a>
+        <a href="#activity" class="nav-link highlight">Interactive Quiz</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Search Button -->
+        <div class="search-bar-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="globalSearchInput" placeholder="Search methods, tools..." autocomplete="off">
+          <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light/Dark Theme">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <a href="Green Monochromatic Simple The Minimalist Presentation Template.pdf" target="_blank" class="pdf-btn" title="Download Original PDF Presentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        </a>
       </div>
-    </div>
-
-    <div class="header-actions">
-      <button class="icon-btn" id="btnSearch" title="Search Slides (S)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnGrid" title="Slide Overview / Grid (O)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnPresenter" title="Presenter Mode & Notes (P)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h20v14H2z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnDraw" title="Annotation / Pen Tool (D)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnLaser" title="Laser Pointer (L)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnHelp" title="Shortcuts & Help (?)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </button>
-
-      <button class="icon-btn" id="btnFullscreen" title="Toggle Fullscreen (F)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="fs-icon-open"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-      </button>
     </div>
   </header>
 
-  <!-- Drawing Sub-Toolbar (Shown when pen tool is active) -->
-  <div class="drawing-toolbar" id="drawingToolbar" style="display: none;">
-    <div class="drawing-controls">
-      <span class="tool-label">Pen Color:</span>
-      <button class="color-dot active" data-color="#ff4757" style="background:#ff4757;"></button>
-      <button class="color-dot" data-color="#2ed573" style="background:#2ed573;"></button>
-      <button class="color-dot" data-color="#1e90ff" style="background:#1e90ff;"></button>
-      <button class="color-dot" data-color="#ffa502" style="background:#ffa502;"></button>
-      <button class="color-dot" data-color="#ffffff" style="background:#ffffff;"></button>
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <span class="hero-pill">
+          <span class="pulse-dot"></span> Interactive Masterclass & Pedagogy Framework
+        </span>
+        <h1 class="hero-title">Instructional Material & <br><span class="text-gradient">Teaching Strategies</span></h1>
+        <p class="hero-lead">
+          An interactive, modern guide exploring the core methods, techniques, instructional strategies, and educational devices that elevate learning outcomes in modern classrooms.
+        </p>
 
-      <div class="divider"></div>
-
-      <span class="tool-label">Size:</span>
-      <input type="range" id="penSize" min="2" max="20" value="4">
-
-      <div class="divider"></div>
-
-      <button class="text-btn" id="btnClearCanvas">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        Clear
-      </button>
-      <button class="text-btn close-draw" id="btnCloseDraw">Done</button>
-    </div>
-  </div>
-
-  <!-- Main Presentation Stage Area -->
-  <main class="presentation-stage" id="presentationStage">
-    
-    <!-- Laser Pointer Canvas overlay -->
-    <div class="laser-pointer" id="laserPointer"></div>
-
-    <!-- Screen Overlay for Blackout / Whiteout -->
-    <div class="screen-overlay" id="screenOverlay">
-      <div class="overlay-msg" id="overlayMsg">Screen Paused (Press B or W to Resume)</div>
-    </div>
-
-    <!-- Active Slide Stage Container -->
-    <div class="slide-container" id="slideContainer">
-      <div class="slide-wrapper" id="slideWrapper">
-        <img id="currentSlideImg" src="" alt="Presentation Slide" class="slide-image">
-        <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
-      </div>
-    </div>
-
-    <!-- Clickable Navigation Hotspots -->
-    <div class="nav-hotspot left" id="hotspotPrev" title="Previous Slide">
-      <div class="hotspot-arrow">&lsaquo;</div>
-    </div>
-    <div class="nav-hotspot right" id="hotspotNext" title="Next Slide">
-      <div class="hotspot-arrow">&rsaquo;</div>
-    </div>
-  </main>
-
-  <!-- Presenter Notes & Side Panel (Collapsible) -->
-  <aside class="presenter-panel" id="presenterPanel">
-    <div class="panel-header">
-      <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Speaker Notes & Transcript
-      </h3>
-      <button class="icon-btn-sm" id="btnClosePresenter">&times;</button>
-    </div>
-
-    <div class="panel-body">
-      <!-- Presenter Timer -->
-      <div class="presenter-timer-box">
-        <div class="timer-display" id="timerDisplay">00:00:00</div>
-        <div class="timer-controls">
-          <button id="btnTimerStart" class="timer-btn">Start</button>
-          <button id="btnTimerReset" class="timer-btn">Reset</button>
+        <div class="hero-cta-wrap">
+          <a href="#methods" class="btn-primary">
+            Explore Methods
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#activity" class="btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Take Self-Assessment Quiz
+          </a>
         </div>
       </div>
 
-      <!-- Current Slide Info -->
-      <div class="slide-notes-card">
-        <h4 id="notesSlideTitle">Slide 1 Title</h4>
-        <div class="notes-content" id="notesContent">
-          Loading speaker notes...
+      <!-- Quick Metrics Counter Cards -->
+      <div class="hero-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon mint">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="metric-num" data-target="8">8</div>
+          <div class="metric-label">Teaching Methods</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon emerald">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="metric-num" data-target="3">3</div>
+          <div class="metric-label">General Techniques</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon gold">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div class="metric-num" data-target="5">5</div>
+          <div class="metric-label">Instructional Strategies</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="metric-num" data-target="3">3</div>
+          <div class="metric-label">Device Categories</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1: 8 TEACHING METHODS -->
+  <section class="section-padding bg-surface-1" id="methods">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Module 01</span>
+        <h2 class="section-title">The 8 Core Teaching Methods</h2>
+        <p class="section-desc">Structured methodologies teachers employ to deliver content, build skills, and facilitate real-world understanding.</p>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All Methods (8)</button>
+        <button class="filter-btn" data-filter="direct">Direct & Expert</button>
+        <button class="filter-btn" data-filter="group">Collaborative & Group</button>
+        <button class="filter-btn" data-filter="realworld">Real-World & Experiential</button>
+      </div>
+
+      <!-- Methods Grid -->
+      <div class="methods-grid" id="methodsGrid">
+
+        <!-- Method 1: Lecture -->
+        <div class="method-card" data-category="direct">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_07_1.jpeg" alt="Lecture Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method A</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">A. Lecture Method</h3>
+            <p class="card-text">An oral presentation by an expert designed to clarify information to a large group in a short period of time. Ideal for tackling specialized topics efficiently.</p>
+            <div class="card-tags">
+              <span class="chip">Oral Delivery</span>
+              <span class="chip">Expert-Led</span>
+              <span class="chip">Large Group</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-lecture">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 2: Demonstration / Performance -->
+        <div class="method-card" data-category="direct">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_08_1.jpeg" alt="Demonstration Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method B</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">B. Demonstration / Performance</h3>
+            <p class="card-text">The teacher models a general principle using a concrete, real example first. Students then practice the exact skill based on what they observed.</p>
+            <div class="card-tags">
+              <span class="chip">Modeling</span>
+              <span class="chip">Concrete Example</span>
+              <span class="chip">Student Practice</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-demo">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 3: Discussion -->
+        <div class="method-card" data-category="group">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_09_1.png" alt="Discussion Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method C</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">C. Discussion Method</h3>
+            <p class="card-text">A free, two-way exchange between teacher and students for exploring attitudes, interpretations, questions, and opinions rather than just rigid facts.</p>
+            <div class="card-tags">
+              <span class="chip">Two-Way Exchange</span>
+              <span class="chip">Attitudes & Opinions</span>
+              <span class="chip">Interactive</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-discussion">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 4: Case Study -->
+        <div class="method-card" data-category="realworld">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_10_1.jpeg" alt="Case Study Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method D</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">D. Case Study</h3>
+            <p class="card-text">In-depth investigation of a single subject, group, organization, or event in its real-world context to analyze general principles and evaluate scenarios.</p>
+            <div class="card-tags">
+              <span class="chip">In-Depth Analysis</span>
+              <span class="chip">Real-World Context</span>
+              <span class="chip">Evaluation</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-casestudy">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 5: Small Group Work -->
+        <div class="method-card" data-category="group">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_11_1.jpeg" alt="Pairs or Small Group Work" class="card-img" loading="lazy">
+            <span class="method-tag">Method E</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">E. Pairs or Small Group Work</h3>
+            <p class="card-text">Students collaborate in pairs or small groups on application and analysis problems. Complements larger course structures to foster active peer learning.</p>
+            <div class="card-tags">
+              <span class="chip">Peer Collaboration</span>
+              <span class="chip">Problem Solving</span>
+              <span class="chip">Group Work</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-groupwork">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 6: Field Studies -->
+        <div class="method-card" data-category="realworld">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_12_1.jpeg" alt="Field Studies Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method F</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">F. Field Studies</h3>
+            <p class="card-text">Out-of-the-classroom activity presenting concepts in realistic settings. Qualitative data collection in natural environments (e.g., Field Trips).</p>
+            <div class="card-tags">
+              <span class="chip">Outdoor Activity</span>
+              <span class="chip">Field Trip</span>
+              <span class="chip">Qualitative Research</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-fieldstudies">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 7: Simulation -->
+        <div class="method-card" data-category="realworld">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_13_1.jpeg" alt="Simulation Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method G</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">G. Simulation</h3>
+            <p class="card-text">Recreating conditions using mathematical/virtual models to test behaviors and predict outcomes in safe controlled environments (e.g. Virtual Labs, Simulation Games).</p>
+            <div class="card-tags">
+              <span class="chip">Controlled Model</span>
+              <span class="chip">Virtual Lab</span>
+              <span class="chip">Safe Testing</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-simulation">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Method 8: Role Playing -->
+        <div class="method-card" data-category="group">
+          <div class="card-image-wrap">
+            <img src="assets/images/img_slide_14_1.jpeg" alt="Role Playing Method" class="card-img" loading="lazy">
+            <span class="method-tag">Method H</span>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">H. Role Playing</h3>
+            <p class="card-text">A dramatic approach where students enact learning episodes. Highly action-filled enactment through which participants depict real scenarios.</p>
+            <div class="card-tags">
+              <span class="chip">Dramatic Enactment</span>
+              <span class="chip">Action-Filled</span>
+              <span class="chip">Empathy Building</span>
+            </div>
+            <button class="card-action-btn" data-modal="modal-roleplaying">View Details & Key Points &rarr;</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: TECHNIQUES OF TEACHING -->
+  <section class="section-padding" id="techniques">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Module 02</span>
+        <h2 class="section-title">Techniques of Teaching</h2>
+        <p class="section-desc">The specific steps, styles, or artistic execution teachers utilize to accomplish immediate learning objectives.</p>
+      </div>
+
+      <!-- Definition Callout -->
+      <div class="definition-banner">
+        <div class="banner-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="banner-body">
+          <h3>What is a Teaching Technique?</h3>
+          <p>Teaching techniques are individual steps and stylistic tricks teachers follow. It refers to technical skill, artistic execution, and the skill of manipulating educational devices to stimulate the learner's psychological processes toward effective learning reactions.</p>
         </div>
       </div>
 
-      <!-- Next Slide Preview -->
-      <div class="next-slide-preview">
-        <div class="preview-label">Next Slide Preview:</div>
-        <img id="nextSlideImg" src="" alt="Next Slide Preview" class="preview-thumb">
-        <div id="nextSlideTitle" class="preview-title">Next Slide Title</div>
-      </div>
-    </div>
-  </aside>
+      <!-- 3 General Techniques Cards -->
+      <div class="techniques-3grid">
+        <div class="tech-card">
+          <div class="tech-num">01</div>
+          <h3>Question & Answer</h3>
+          <span class="tech-focus">Knowledge Focus</span>
+          <p>Stimulates critical thinking and checks knowledge retention through targeted questioning strategies.</p>
+        </div>
 
-  <!-- Bottom Interactive Deck Controls -->
-  <footer class="app-footer" id="appFooter">
-    <div class="footer-left">
-      <button class="ctrl-btn" id="btnPrev" title="Previous Slide (Left Arrow)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-        Prev
-      </button>
-      
-      <div class="slide-counter-wrap">
-        <input type="number" id="slideInput" min="1" max="46" value="1">
-        <span class="total-count">/ <span id="totalSlidesCount">46</span></span>
-      </div>
+        <div class="tech-card active">
+          <div class="tech-num">02</div>
+          <h3>Drill Method</h3>
+          <span class="tech-focus">Skill & Habits Focus</span>
+          <p>Reinforces repetitive practice to convert emerging skills into permanent automatic habits.</p>
+        </div>
 
-      <button class="ctrl-btn" id="btnNext" title="Next Slide (Right Arrow / Space)">
-        Next
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-
-    <div class="footer-center">
-      <!-- Transition Selector -->
-      <div class="select-wrap" title="Slide Transition Effect">
-        <span class="select-label">Effect:</span>
-        <select id="transitionSelect">
-          <option value="transition-fade" selected>Fade</option>
-          <option value="transition-slide">Slide</option>
-          <option value="transition-zoom">Zoom</option>
-          <option value="transition-flip">Flip</option>
-        </select>
+        <div class="tech-card">
+          <div class="tech-num">03</div>
+          <h3>Appreciation</h3>
+          <span class="tech-focus">Attitude & Values Focus</span>
+          <p>Nurtures emotional connection, aesthetic appreciation, and positive student attitudes toward learning.</p>
+        </div>
       </div>
 
-      <!-- Auto Play Controls -->
-      <button class="ctrl-btn secondary" id="btnAutoplay" title="Start Slideshow Auto-play">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="autoplayIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span id="autoplayText">Auto Play</span>
-      </button>
+      <!-- Interactive Accordion for Standards & Rules -->
+      <div class="accordion-wrap">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span><strong>Standards Governing Selection of Technique</strong> (4 Key Factors)</span>
+            <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-content">
+            <ul class="spec-list">
+              <li><strong>1. The Subject Matter:</strong> Must align seamlessly with the nature of what is being taught.</li>
+              <li><strong>2. The Students:</strong> Must suit the age, nature, background, and maturity of the pupils.</li>
+              <li><strong>3. The Teacher:</strong> Based on the teacher’s personal ability, style, and pedagogical training.</li>
+              <li><strong>4. Time Allotted:</strong> Tailored to the realistic time limits available for the lesson.</li>
+            </ul>
+          </div>
+        </div>
 
-      <select id="autoplaySpeed" class="speed-select" title="Auto Play Interval">
-        <option value="3000">3s</option>
-        <option value="5000" selected>5s</option>
-        <option value="8000">8s</option>
-        <option value="10000">10s</option>
-      </select>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span><strong>Rules Governing the Use of Techniques</strong></span>
+            <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-content">
+            <ul class="spec-list">
+              <li><strong>Means to an End:</strong> A technique should never be the ultimate goal; it is a vehicle to achieve learning.</li>
+              <li><strong>Judged by Effect:</strong> The success of a technique is determined solely by its learning outcome in context.</li>
+              <li><strong>Primary Laws of Learning:</strong> Must tap into fundamental psychological laws of learning (Readiness, Exercise, Effect).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="footer-right">
-      <button class="ctrl-btn secondary" id="btnOriginalPdf" title="Original PDF File">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        PDF Source
-      </button>
+  <!-- SECTION 3: STRATEGIES OF TEACHING -->
+  <section class="section-padding bg-surface-1" id="strategies">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Module 03</span>
+        <h2 class="section-title">Instructional Strategies</h2>
+        <p class="section-desc">Why we teach this way: overarching methods, approaches, and frameworks that guide how content is introduced and mastered.</p>
+      </div>
+
+      <!-- Strategy Tabs Interface -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="tab-direct">Direct Instruction</button>
+          <button class="tab-btn" data-tab="tab-collab">Collaborative Learning</button>
+          <button class="tab-btn" data-tab="tab-inquiry">Inquiry-Based</button>
+          <button class="tab-btn" data-tab="tab-diff">Differentiated</button>
+          <button class="tab-btn" data-tab="tab-assess">Assessment for Learning</button>
+        </div>
+
+        <div class="tabs-body">
+          
+          <!-- Tab 1 -->
+          <div class="tab-pane active" id="tab-direct">
+            <div class="tab-content-grid">
+              <div class="tab-text">
+                <span class="badge-accent">Clear & Explicit</span>
+                <h3>Direct Instruction</h3>
+                <p>Direct instruction uses explicit, teacher-led instruction to introduce new skills and concepts. The teacher models the skill, explains thinking processes, and guides students through structured practice.</p>
+                <div class="example-box">
+                  <strong>Key Examples:</strong>
+                  <ul>
+                    <li>Modeling & Think-Alouds</li>
+                    <li>Guided Practice & Feedback</li>
+                    <li>Explicit Vocabulary Instruction</li>
+                    <li>Mini-Lessons (10-15 mins)</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-img-wrap">
+                <img src="assets/images/img_slide_23_1.jpeg" alt="Direct Instruction" class="tab-img">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2 -->
+          <div class="tab-pane" id="tab-collab">
+            <div class="tab-content-grid">
+              <div class="tab-text">
+                <span class="badge-accent">Peer Interaction</span>
+                <h3>Collaborative Learning</h3>
+                <p>Tasks students with working together in teams to solve complex problems, develop creative ideas, and deepen understanding through meaningful dialogue.</p>
+                <div class="example-box">
+                  <strong>Key Examples:</strong>
+                  <ul>
+                    <li>Think-Pair-Share Activities</li>
+                    <li>Literature Circles & Jigsaw</li>
+                    <li>Group Projects & Peer Review</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-img-wrap">
+                <img src="assets/images/img_slide_25_1.jpeg" alt="Collaborative Learning" class="tab-img">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3 -->
+          <div class="tab-pane" id="tab-inquiry">
+            <div class="tab-content-grid">
+              <div class="tab-text">
+                <span class="badge-accent">Student-Driven Exploration</span>
+                <h3>Inquiry-Based Learning</h3>
+                <p>Encourages students to actively explore ideas, formulate questions, conduct research, and discover answers independently.</p>
+                <div class="example-box">
+                  <strong>Key Examples:</strong>
+                  <ul>
+                    <li>Project-Based Learning (PBL)</li>
+                    <li>Socratic Seminars & Debates</li>
+                    <li>Hands-on Experiments & Research Tasks</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-img-wrap">
+                <img src="assets/images/img_slide_27_1.jpeg" alt="Inquiry Learning" class="tab-img">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4 -->
+          <div class="tab-pane" id="tab-diff">
+            <div class="tab-content-grid">
+              <div class="tab-text">
+                <span class="badge-accent">Personalized Learning</span>
+                <h3>Differentiated Instruction</h3>
+                <p>Helps teachers meet diverse student learning needs by adjusting content, tasks, learning environments, or instructional delivery.</p>
+                <div class="example-box">
+                  <strong>Key Examples:</strong>
+                  <ul>
+                    <li>Tiered Assignments</li>
+                    <li>Flexible Grouping Strategies</li>
+                    <li>Choice Boards & Scaffolded Texts</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-img-wrap">
+                <img src="assets/images/img_slide_29_1.jpeg" alt="Differentiated Instruction" class="tab-img">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 5 -->
+          <div class="tab-pane" id="tab-assess">
+            <div class="tab-content-grid">
+              <div class="tab-text">
+                <span class="badge-accent">Continuous Checks</span>
+                <h3>Assessment for Learning</h3>
+                <p>Ongoing checks for understanding used to inform immediate next steps in instruction and evaluate student mastery.</p>
+                <div class="example-box">
+                  <strong>Key Examples:</strong>
+                  <ul>
+                    <li>Exit Tickets & Quick Writes</li>
+                    <li>Teacher-Student Conferences</li>
+                    <li><strong>3-2-1 Prompt:</strong> 3 things learned, 2 interesting facts, 1 remaining question.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-img-wrap">
+                <img src="assets/images/img_slide_31_1.png" alt="Assessment" class="tab-img">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: EDUCATIONAL DEVICES -->
+  <section class="section-padding" id="devices">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Module 04</span>
+        <h2 class="section-title">Educational Devices & Tools</h2>
+        <p class="section-desc">Teaching aids and visual tools used to facilitate instruction, capture imagination, and enhance comprehension.</p>
+      </div>
+
+      <!-- Why We Need Devices Grid -->
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">🎯</div>
+          <h4>Capture Attention</h4>
+          <p>Hooks student focus at the start of a lesson.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">✨</div>
+          <h4>Stimulate Imagination</h4>
+          <p>Fosters creative thinking and conceptualization.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">💡</div>
+          <h4>Improve Understanding</h4>
+          <p>Translates abstract theories into visual clarity.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🤝</div>
+          <h4>Encourage Participation</h4>
+          <p>Promotes active student engagement.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🎧</div>
+          <h4>Develop Listening Skills</h4>
+          <p>Enhances auditory and visual processing.</p>
+        </div>
+      </div>
+
+      <!-- Classifications of Devices -->
+      <div class="device-classification-box">
+        <h3 class="box-title">Classifications & Categories of Devices</h3>
+        
+        <div class="categories-grid">
+
+          <!-- Category 1 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              <span class="cat-num">01</span>
+              <h4>Material Devices</h4>
+            </div>
+            <p>Physical teaching tools used in instruction.</p>
+            <ul class="cat-list">
+              <li><strong>General Devices:</strong> Used across all subjects (blackboard, chalk, paper, books).</li>
+              <li><strong>Special Devices:</strong> Used for specific subjects (lab equipment, compass, specialized tools).</li>
+            </ul>
+          </div>
+
+          <!-- Category 2 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              <span class="cat-num">02</span>
+              <h4>Representations & Replicas</h4>
+            </div>
+            <p>Physical scale models representing real objects.</p>
+            <ul class="cat-list">
+              <li>Terrestrial Globes & World Maps</li>
+              <li>Anatomical / Architectural Models</li>
+              <li>Miniatures of real-world objects</li>
+            </ul>
+          </div>
+
+          <!-- Category 3 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              <span class="cat-num">03</span>
+              <h4>Electronic & Digital Equipment</h4>
+            </div>
+            <p>Modern technology tools and multimedia aids.</p>
+            <ul class="cat-list">
+              <li>Computers, Laptops & iPads</li>
+              <li>Projectors & Interactive Screens</li>
+              <li>Films, Educational Videos & Slides</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Selection Criteria Banner -->
+      <div class="criteria-card">
+        <h3>5 Criteria for Selecting Educational Devices</h3>
+        <div class="criteria-grid">
+          <div class="crit-item">
+            <span class="crit-num">1</span>
+            <strong>Supports Learning:</strong> Directly aids subject mastery and lesson goals.
+          </div>
+          <div class="crit-item">
+            <span class="crit-num">2</span>
+            <strong>Adapts to Students:</strong> Fits individual student needs and learning styles.
+          </div>
+          <div class="crit-item">
+            <span class="crit-num">3</span>
+            <strong>Balanced Quantity:</strong> Provides options without overwhelming the class.
+          </div>
+          <div class="crit-item">
+            <span class="crit-num">4</span>
+            <strong>Practical & Economical:</strong> Cost-effective and functional for real learning.
+          </div>
+          <div class="crit-item">
+            <span class="crit-num">5</span>
+            <strong>Ready to Use:</strong> Accessible, simple, and easily deployed in classroom settings.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 5: INTERACTIVE QUIZ & ACTIVITY -->
+  <section class="section-padding bg-surface-1" id="activity">
+    <div class="container">
+      <div class="quiz-wrapper">
+        <div class="quiz-header">
+          <span class="section-badge">Interactive Activity</span>
+          <h2>Self-Assessment Knowledge Challenge</h2>
+          <p>Test your understanding of Teaching Methods, Techniques, Strategies, and Devices!</p>
+        </div>
+
+        <div class="quiz-card" id="quizCard">
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quizProgressFill" style="width: 20%;"></div>
+          </div>
+
+          <div class="quiz-question-meta">
+            <span id="quizQuestionNumber">Question 1 of 5</span>
+            <span id="quizScoreCount">Score: 0</span>
+          </div>
+
+          <h3 class="quiz-question-text" id="quizQuestionText">Loading Question...</h3>
+
+          <div class="quiz-options-list" id="quizOptionsList">
+            <!-- Options dynamically injected -->
+          </div>
+
+          <div class="quiz-feedback" id="quizFeedback" style="display: none;">
+            <div id="quizFeedbackTitle">Correct!</div>
+            <div id="quizFeedbackText">Explanation text goes here...</div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="btn-primary" id="btnNextQuestion" style="display: none;">Next Question &rarr;</button>
+          </div>
+        </div>
+
+        <div class="quiz-result-card" id="quizResultCard" style="display: none;">
+          <div class="result-badge">🏆 Quiz Completed!</div>
+          <h3 id="resultScoreText">You scored 5 out of 5</h3>
+          <p id="resultFeedbackText">Outstanding! You have mastered teaching methods, strategies, and devices.</p>
+          <button class="btn-primary" id="btnRestartQuiz">Restart Quiz</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: SCRIPTURE VERSE & FOOTER -->
+  <section class="verse-section">
+    <div class="container">
+      <div class="verse-card">
+        <div class="verse-quote-icon">“</div>
+        <p class="verse-text">
+          A wise man is full of strength, and a man of knowledge enhances his might, for by wise guidance you can wage your war, and in abundance of counselors there is victory.
+        </p>
+        <div class="verse-ref">Proverbs 24:5-6</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h3>EduStrategy Hub</h3>
+        <p>Interactive Educational Framework & Teaching Methodology</p>
+      </div>
+      <div class="footer-meta">
+        <span>Presented by <strong>Shawn Garcia</strong> | Liceria & Co.</span>
+        <span>February 2026</span>
+      </div>
     </div>
   </footer>
 
-  <!-- Grid / Overview Modal -->
-  <div class="modal-overlay" id="gridModal">
-    <div class="modal-card grid-modal-card">
-      <div class="modal-header">
-        <h2>Slide Gallery Overview (46 Slides)</h2>
-        <div class="modal-header-actions">
-          <input type="text" id="gridSearchInput" placeholder="Filter slides..." class="grid-search-input">
-          <button class="close-modal-btn" id="btnCloseGrid">&times;</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="slides-grid" id="slidesGridContainer">
-          <!-- Thumbnail cards dynamically injected -->
-        </div>
+  <!-- Modal Template for Method Deep-Dives -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-card">
+      <button class="close-modal" id="btnCloseDetailModal">&times;</button>
+      <div class="modal-body" id="detailModalBody">
+        <!-- Content dynamically injected -->
       </div>
     </div>
   </div>
 
-  <!-- Search Modal -->
-  <div class="modal-overlay" id="searchModal">
-    <div class="modal-card search-modal-card">
-      <div class="modal-header">
-        <h2>Search Presentation Content</h2>
-        <button class="close-modal-btn" id="btnCloseSearch">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="search-input-box">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Type keywords e.g., 'Instructional', 'Demonstration', 'Role Playing'..." autofocus>
-        </div>
-        <div class="search-results-list" id="searchResultsList">
-          <div class="empty-search">Type a query above to search across all slides...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Help & Keyboard Shortcuts Modal -->
-  <div class="modal-overlay" id="helpModal">
-    <div class="modal-card help-modal-card">
-      <div class="modal-header">
-        <h2>Keyboard Shortcuts & Instructions</h2>
-        <button class="close-modal-btn" id="btnCloseHelp">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="shortcuts-grid">
-          <div class="shortcut-item">
-            <span class="key-badge">Right Arrow</span> / <span class="key-badge">Space</span>
-            <span class="key-desc">Next Slide</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">Left Arrow</span>
-            <span class="key-desc">Previous Slide</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">F</span>
-            <span class="key-desc">Toggle Fullscreen</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">O</span> / <span class="key-badge">G</span>
-            <span class="key-desc">Slide Grid Overview</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">P</span>
-            <span class="key-desc">Presenter Notes Mode</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">S</span>
-            <span class="key-desc">Search Presentation</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">L</span>
-            <span class="key-desc">Toggle Laser Pointer</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">D</span>
-            <span class="key-desc">Toggle Pen Drawing Tool</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">B</span>
-            <span class="key-desc">Blackout Screen</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">W</span>
-            <span class="key-desc">Whiteout Screen</span>
-          </div>
-          <div class="shortcut-item">
-            <span class="key-badge">Esc</span>
-            <span class="key-desc">Exit Overview / Modals</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="slides_data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

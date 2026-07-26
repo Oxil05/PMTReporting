@@ -1,605 +1,425 @@
 /**
- * Instructional Material & Strategies - Interactive Deck Controller
+ * EduStrategy Hub - Interactive Static Web Application Controller
  */
 
 (function () {
   'use strict';
 
-  // State Management
-  let currentIndex = 0; // 0-indexed
-  const totalSlides = SLIDES_DATA.length;
-  let isAutoplay = false;
-  let autoplayTimer = null;
-  let isLaserActive = false;
-  let isDrawingMode = false;
-  let isBlackout = false;
-  let isWhiteout = false;
-  let timerInterval = null;
-  let timerSeconds = 0;
-  let currentPenColor = '#ff4757';
-  let currentPenSize = 4;
-  let isDrawing = false;
-  let lastX = 0;
-  let lastY = 0;
-
-  // DOM Elements
-  const slideContainer = document.getElementById('slideContainer');
-  const slideWrapper = document.getElementById('slideWrapper');
-  const currentSlideImg = document.getElementById('currentSlideImg');
-  const slideHeaderTitle = document.getElementById('slideHeaderTitle');
-  const slideInput = document.getElementById('slideInput');
-  const totalSlidesCount = document.getElementById('totalSlidesCount');
-
-  // Controls & Modals
-  const btnPrev = document.getElementById('btnPrev');
-  const btnNext = document.getElementById('btnNext');
-  const hotspotPrev = document.getElementById('hotspotPrev');
-  const hotspotNext = document.getElementById('hotspotNext');
-  const btnFullscreen = document.getElementById('btnFullscreen');
-  const btnGrid = document.getElementById('btnGrid');
-  const btnSearch = document.getElementById('btnSearch');
-  const btnPresenter = document.getElementById('btnPresenter');
-  const btnDraw = document.getElementById('btnDraw');
-  const btnLaser = document.getElementById('btnLaser');
-  const btnHelp = document.getElementById('btnHelp');
-  const btnAutoplay = document.getElementById('btnAutoplay');
-  const autoplaySpeed = document.getElementById('autoplaySpeed');
-  const transitionSelect = document.getElementById('transitionSelect');
-  const btnOriginalPdf = document.getElementById('btnOriginalPdf');
-
-  // Drawing Canvas
-  const drawingCanvas = document.getElementById('drawingCanvas');
-  const ctx = drawingCanvas.getContext('2d');
-  const drawingToolbar = document.getElementById('drawingToolbar');
-  const penSizeInput = document.getElementById('penSize');
-  const btnClearCanvas = document.getElementById('btnClearCanvas');
-  const btnCloseDraw = document.getElementById('btnCloseDraw');
-  const colorDots = document.querySelectorAll('.color-dot');
-
-  // Laser Pointer
-  const laserPointer = document.getElementById('laserPointer');
-  const presentationStage = document.getElementById('presentationStage');
-
-  // Screen Overlay
-  const screenOverlay = document.getElementById('screenOverlay');
-  const overlayMsg = document.getElementById('overlayMsg');
-
-  // Presenter Panel
-  const presenterPanel = document.getElementById('presenterPanel');
-  const btnClosePresenter = document.getElementById('btnClosePresenter');
-  const timerDisplay = document.getElementById('timerDisplay');
-  const btnTimerStart = document.getElementById('btnTimerStart');
-  const btnTimerReset = document.getElementById('btnTimerReset');
-  const notesSlideTitle = document.getElementById('notesSlideTitle');
-  const notesContent = document.getElementById('notesContent');
-  const nextSlideImg = document.getElementById('nextSlideImg');
-  const nextSlideTitle = document.getElementById('nextSlideTitle');
-
-  // Modals
-  const gridModal = document.getElementById('gridModal');
-  const btnCloseGrid = document.getElementById('btnCloseGrid');
-  const slidesGridContainer = document.getElementById('slidesGridContainer');
-  const gridSearchInput = document.getElementById('gridSearchInput');
-
-  const searchModal = document.getElementById('searchModal');
-  const btnCloseSearch = document.getElementById('btnCloseSearch');
-  const searchInput = document.getElementById('searchInput');
-  const searchResultsList = document.getElementById('searchResultsList');
-
-  const helpModal = document.getElementById('helpModal');
-  const btnCloseHelp = document.getElementById('btnCloseHelp');
-
-  // Initialize
-  function init() {
-    totalSlidesCount.textContent = totalSlides;
-    slideInput.max = totalSlides;
-
-    renderGridThumbnails();
-    goToSlide(0);
-
-    // Event Listeners
-    setupEventListeners();
-    preloadAdjacentImages();
-    resizeCanvas();
-  }
-
-  // Go to Slide Function with Animations
-  function goToSlide(index, direction = 'next') {
-    if (index < 0) index = 0;
-    if (index >= totalSlides) index = totalSlides - 1;
-
-    const oldIndex = currentIndex;
-    currentIndex = index;
-
-    // Apply animation class
-    const transitionType = transitionSelect.value || 'transition-fade';
-    document.body.className = `${transitionType} ${isDrawingMode ? 'drawing-mode' : ''}`;
-    
-    if (direction === 'next') {
-      slideWrapper.classList.add('slide-changing-next', 'slide-changing');
-    } else {
-      slideWrapper.classList.add('slide-changing-prev', 'slide-changing');
+  // Quiz Data (5 Questions based on Presentation Content)
+  const QUIZ_QUESTIONS = [
+    {
+      question: "Which teaching method involves a teacher modeling a skill first with a concrete example, followed by student practice?",
+      options: [
+        "A. Lecture Method",
+        "B. Demonstration / Performance Method",
+        "C. Case Study Method",
+        "D. Role Playing Method"
+      ],
+      correct: 1,
+      explanation: "Demonstration/Performance method starts with the teacher illustrating a general principle using a real example (modeling), after which students practice that same skill."
+    },
+    {
+      question: "What are the 3 General Techniques of Teaching?",
+      options: [
+        "A. Lecture, Group Work, and Field Trip",
+        "B. Question & Answer, Drill, and Appreciation",
+        "C. Direct Instruction, Inquiry, and Assessment",
+        "D. Material Devices, Mental Devices, and Replicas"
+      ],
+      correct: 1,
+      explanation: "The 3 general techniques are Question & Answer (Knowledge focus), Drill (Skill & Habits focus), and Appreciation (Attitude focus)."
+    },
+    {
+      question: "Which instructional strategy encourages students to explore ideas, ask questions, and discover answers on their own?",
+      options: [
+        "A. Direct Instruction",
+        "B. Collaborative Learning",
+        "C. Inquiry-Based Learning",
+        "D. Differentiated Instruction"
+      ],
+      correct: 2,
+      explanation: "Inquiry-Based Learning prompts students to discover answers independently through project-based learning, research, and experiments."
+    },
+    {
+      question: "What type of teaching method recreates real conditions using models when actual experimentation is too dangerous or expensive?",
+      options: [
+        "A. Field Studies",
+        "B. Simulation",
+        "C. Discussion",
+        "D. Small Group Work"
+      ],
+      correct: 1,
+      explanation: "Simulation recreates real-world conditions in a safe, controlled environment when actual testing is dangerous or costly (e.g. virtual labs)."
+    },
+    {
+      question: "What is the primary role of an educational device in a classroom?",
+      options: [
+        "A. To completely replace the teacher's lesson procedure",
+        "B. To act as a teaching aid that facilitates instruction and captures student attention",
+        "C. To serve as the ultimate goal of the lesson",
+        "D. Only to provide entertainment to students"
+      ],
+      correct: 1,
+      explanation: "A device is a teaching aid/tool that facilitates instruction, captures attention, and aids comprehension. It is a means to an end, never a substitute for teaching."
     }
+  ];
 
-    setTimeout(() => {
-      const slide = SLIDES_DATA[currentIndex];
-      currentSlideImg.src = slide.image;
-      slideHeaderTitle.textContent = slide.title;
-      slideInput.value = currentIndex + 1;
+  // Deep-dive Modal content for 8 methods
+  const METHOD_DETAILS = {
+    'modal-lecture': {
+      title: 'A. Lecture Method',
+      badge: 'Direct Instruction',
+      image: 'assets/images/img_slide_07_1.jpeg',
+      description: 'An oral presentation by an expert designed to clarify information to a large group in a short period of time.',
+      points: [
+        'Resorts to tackling special topics requiring domain expertise.',
+        'Efficient delivery for large audiences in limited time.',
+        'Best paired with interactive follow-up Q&A sessions.'
+      ]
+    },
+    'modal-demo': {
+      title: 'B. Demonstration / Performance',
+      badge: 'Skill Modeling',
+      image: 'assets/images/img_slide_08_1.jpeg',
+      description: 'The teacher illustrates a general principle using a concrete, real example, modeling the skill first before students practice.',
+      points: [
+        'Scaffolds learning through step-by-step physical or visual modeling.',
+        'Encourages immediate hands-on performance by students.',
+        'High retention rate through observation and direct practice.'
+      ]
+    },
+    'modal-discussion': {
+      title: 'C. Discussion Method',
+      badge: 'Interactive Dialogue',
+      image: 'assets/images/img_slide_09_1.png',
+      description: 'A free, two-way exchange between teacher and students for exploring attitudes, interpretations, questions, and opinions.',
+      points: [
+        'Moves beyond one-way lectures into deep collaborative discourse.',
+        'Helps uncover student perspectives, values, and critical thinking.',
+        'Requires strong teacher moderation to keep discourse focused.'
+      ]
+    },
+    'modal-casestudy': {
+      title: 'D. Case Study',
+      badge: 'Real-World Analysis',
+      image: 'assets/images/img_slide_10_1.jpeg',
+      description: 'An in-depth investigation of a single subject, group, organization, or event in its real-world context.',
+      points: [
+        'Aims at applying general principles to complex specific scenarios.',
+        'Develops analytical, diagnostic, and decision-making skills.',
+        'Widely used in business, science, social studies, and ethics.'
+      ]
+    },
+    'modal-groupwork': {
+      title: 'E. Pairs or Small Group Work',
+      badge: 'Peer Collaboration',
+      image: 'assets/images/img_slide_11_1.jpeg',
+      description: 'Students work in pairs or small groups on problems of application and analysis.',
+      points: [
+        'Integrated into larger course structures to boost engagement.',
+        'Promotes peer scaffolding and teamwork communication.',
+        'Drives collective problem-solving and critical debate.'
+      ]
+    },
+    'modal-fieldstudies': {
+      title: 'F. Field Studies',
+      badge: 'Out-of-Classroom',
+      image: 'assets/images/img_slide_12_1.jpeg',
+      description: 'Out-of-the-classroom activity intended to present concepts in the most realistic natural manner (e.g. Field Trips).',
+      points: [
+        'Qualitative research method collecting data in real-world settings.',
+        'Bridges abstract textbook concepts with authentic physical reality.',
+        'Enhances observational and qualitative recording skills.'
+      ]
+    },
+    'modal-simulation': {
+      title: 'G. Simulation',
+      badge: 'Controlled Modeling',
+      image: 'assets/images/img_slide_13_1.jpeg',
+      description: 'Imitation of a real process or concept using mathematical or virtual models to recreate conditions and test outcomes.',
+      points: [
+        'Used when actual experimentation is too dangerous, costly, or impossible.',
+        'Allows safe trial-and-error in virtual labs or gaming environments.',
+        'Predicts outcomes under varied controlled conditions.'
+      ]
+    },
+    'modal-roleplaying': {
+      title: 'H. Role Playing',
+      badge: 'Dramatic Enactment',
+      image: 'assets/images/img_slide_14_1.jpeg',
+      description: 'Action-filled enactment by students of learning episodes depicting real interpersonal or historical situations.',
+      points: [
+        'Builds deep emotional empathy and situational awareness.',
+        'Engages visual, auditory, and kinesthetic learners.',
+        'Provides memorable experiential learning opportunities.'
+      ]
+    }
+  };
 
-      // Clear drawing on slide change
-      clearCanvas();
+  // State Variables
+  let currentQuizIndex = 0;
+  let quizScore = 0;
 
-      // Update Presenter View
-      updatePresenterView();
+  // DOM Content Loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initFilters();
+    initModals();
+    initAccordions();
+    initTabs();
+    initQuiz();
+    initSearch();
+    animateMetrics();
+  });
 
-      // Highlight in Grid if open
-      updateGridHighlight();
-
-      setTimeout(() => {
-        slideWrapper.classList.remove('slide-changing-next', 'slide-changing-prev', 'slide-changing');
-      }, 50);
-    }, 150);
-
-    preloadAdjacentImages();
-  }
-
-  // Preload images around current slide
-  function preloadAdjacentImages() {
-    const indicesToPreload = [currentIndex - 1, currentIndex + 1, currentIndex + 2];
-    indicesToPreload.forEach(idx => {
-      if (idx >= 0 && idx < totalSlides) {
-        const img = new Image();
-        img.src = SLIDES_DATA[idx].image;
-      }
+  // Theme Switcher
+  function initTheme() {
+    const themeBtn = document.getElementById('themeToggle');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('theme-light');
     });
   }
 
-  // Update Presenter Side Panel
-  function updatePresenterView() {
-    const slide = SLIDES_DATA[currentIndex];
-    notesSlideTitle.textContent = `Slide ${slide.id}: ${slide.title}`;
-    notesContent.textContent = slide.content || 'No speaker notes for this slide.';
+  // Filter Buttons for Methods Grid
+  function initFilters() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const methodCards = document.querySelectorAll('.method-card');
 
-    const nextIndex = currentIndex + 1;
-    if (nextIndex < totalSlides) {
-      const nextSlide = SLIDES_DATA[nextIndex];
-      nextSlideImg.src = nextSlide.image;
-      nextSlideImg.style.display = 'block';
-      nextSlideTitle.textContent = `Slide ${nextSlide.id}: ${nextSlide.title}`;
-    } else {
-      nextSlideImg.style.display = 'none';
-      nextSlideTitle.textContent = 'End of presentation';
-    }
-  }
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-  // Timer Controls
-  function toggleTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      btnTimerStart.textContent = 'Start';
-    } else {
-      btnTimerStart.textContent = 'Pause';
-      timerInterval = setInterval(() => {
-        timerSeconds++;
-        const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(timerSeconds % 60).padStart(2, '0');
-        timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
-      }, 1000);
-    }
-  }
-
-  function resetTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-    timerSeconds = 0;
-    timerDisplay.textContent = '00:00:00';
-    btnTimerStart.textContent = 'Start';
-  }
-
-  // Render Grid Thumbnails
-  function renderGridThumbnails(filterText = '') {
-    slidesGridContainer.innerHTML = '';
-    
-    SLIDES_DATA.forEach((slide, idx) => {
-      if (filterText && !slide.title.toLowerCase().includes(filterText.toLowerCase()) && !slide.content.toLowerCase().includes(filterText.toLowerCase())) {
-        return;
-      }
-
-      const card = document.createElement('div');
-      card.className = `slide-grid-card ${idx === currentIndex ? 'active' : ''}`;
-      card.setAttribute('data-index', idx);
-
-      card.innerHTML = `
-        <img src="${slide.image}" class="grid-card-thumb" alt="Slide ${slide.id}" loading="lazy">
-        <div class="grid-card-info">
-          <span class="grid-card-title">${slide.title}</span>
-          <span class="grid-card-num">#${slide.id}</span>
-        </div>
-      `;
-
-      card.addEventListener('click', () => {
-        goToSlide(idx);
-        gridModal.classList.remove('active');
-      });
-
-      slidesGridContainer.appendChild(card);
-    });
-  }
-
-  function updateGridHighlight() {
-    const cards = slidesGridContainer.querySelectorAll('.slide-grid-card');
-    cards.forEach(card => {
-      const idx = parseInt(card.getAttribute('data-index'), 10);
-      if (idx === currentIndex) {
-        card.classList.add('active');
-      } else {
-        card.classList.remove('active');
-      }
-    });
-  }
-
-  // Live Full-Text Search
-  function performSearch(query) {
-    if (!query.trim()) {
-      searchResultsList.innerHTML = '<div class="empty-search">Type a query above to search across all slides...</div>';
-      return;
-    }
-
-    const matches = [];
-    const q = query.toLowerCase();
-
-    SLIDES_DATA.forEach((slide, idx) => {
-      if (slide.title.toLowerCase().includes(q) || slide.content.toLowerCase().includes(q)) {
-        // Snippet extraction
-        let snippet = slide.content.replace(/\n/g, ' ');
-        const matchPos = snippet.toLowerCase().indexOf(q);
-        if (matchPos !== -1) {
-          const start = Math.max(0, matchPos - 30);
-          const end = Math.min(snippet.length, matchPos + 70);
-          snippet = (start > 0 ? '...' : '') + snippet.substring(start, end) + (end < snippet.length ? '...' : '');
-        } else {
-          snippet = snippet.substring(0, 100) + '...';
-        }
-
-        matches.push({ slide, idx, snippet });
-      }
-    });
-
-    if (matches.length === 0) {
-      searchResultsList.innerHTML = `<div class="empty-search">No matching slides found for "${query}"</div>`;
-      return;
-    }
-
-    searchResultsList.innerHTML = '';
-    matches.forEach(item => {
-      const resItem = document.createElement('div');
-      resItem.className = 'search-result-item';
-      resItem.innerHTML = `
-        <div class="search-item-header">
-          <span class="search-item-title">${item.slide.title}</span>
-          <span class="search-item-num">Slide ${item.slide.id}</span>
-        </div>
-        <div class="search-item-snippet">${item.snippet}</div>
-      `;
-
-      resItem.addEventListener('click', () => {
-        goToSlide(item.idx);
-        searchModal.classList.remove('active');
-      });
-
-      searchResultsList.appendChild(resItem);
-    });
-  }
-
-  // Auto-Play Slideshow Toggle
-  function toggleAutoplay() {
-    isAutoplay = !isAutoplay;
-
-    if (isAutoplay) {
-      btnAutoplay.classList.add('active');
-      document.getElementById('autoplayText').textContent = 'Pause';
-      const speed = parseInt(autoplaySpeed.value, 10);
-      autoplayTimer = setInterval(() => {
-        if (currentIndex < totalSlides - 1) {
-          goToSlide(currentIndex + 1, 'next');
-        } else {
-          goToSlide(0, 'next'); // Loop back
-        }
-      }, speed);
-    } else {
-      btnAutoplay.classList.remove('active');
-      document.getElementById('autoplayText').textContent = 'Auto Play';
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = null;
-      }
-    }
-  }
-
-  // Laser Pointer Logic
-  function toggleLaser() {
-    isLaserActive = !isLaserActive;
-    btnLaser.classList.toggle('active', isLaserActive);
-    if (isLaserActive) {
-      laserPointer.style.display = 'block';
-      if (isDrawingMode) toggleDrawingMode(); // Mutually exclusive
-    } else {
-      laserPointer.style.display = 'none';
-    }
-  }
-
-  // Pen / Drawing Tool Logic
-  function toggleDrawingMode() {
-    isDrawingMode = !isDrawingMode;
-    btnDraw.classList.toggle('active', isDrawingMode);
-    drawingToolbar.style.display = isDrawingMode ? 'flex' : 'none';
-    document.body.classList.toggle('drawing-mode', isDrawingMode);
-
-    if (isDrawingMode && isLaserActive) toggleLaser();
-  }
-
-  function resizeCanvas() {
-    if (currentSlideImg) {
-      drawingCanvas.width = currentSlideImg.clientWidth || slideWrapper.clientWidth;
-      drawingCanvas.height = currentSlideImg.clientHeight || slideWrapper.clientHeight;
-    }
-  }
-
-  function startDrawing(e) {
-    if (!isDrawingMode) return;
-    isDrawing = true;
-    const rect = drawingCanvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
-  }
-
-  function draw(e) {
-    if (!isDrawing || !isDrawingMode) return;
-    const rect = drawingCanvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(currentX, currentY);
-    ctx.strokeStyle = currentPenColor;
-    ctx.lineWidth = currentPenSize;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    lastX = currentX;
-    lastY = currentY;
-  }
-
-  function stopDrawing() {
-    isDrawing = false;
-  }
-
-  function clearCanvas() {
-    ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-  }
-
-  // Blackout / Whiteout
-  function toggleBlackout() {
-    isBlackout = !isBlackout;
-    isWhiteout = false;
-    screenOverlay.className = `screen-overlay ${isBlackout ? 'active blackout' : ''}`;
-    overlayMsg.textContent = 'Screen Blackout (Press B to Resume)';
-  }
-
-  function toggleWhiteout() {
-    isWhiteout = !isWhiteout;
-    isBlackout = false;
-    screenOverlay.className = `screen-overlay ${isWhiteout ? 'active whiteout' : ''}`;
-    overlayMsg.textContent = 'Screen Whiteout (Press W to Resume)';
-  }
-
-  // Fullscreen Toggle
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(err => console.log(err));
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-  }
-
-  // Touch Swipe Gesture
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  function handleTouchStart(e) {
-    touchStartX = e.changedTouches[0].screenX;
-  }
-
-  function handleTouchEnd(e) {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }
-
-  function handleSwipe() {
-    const diff = touchEndX - touchStartX;
-    if (Math.abs(diff) > 50) {
-      if (diff < 0) {
-        goToSlide(currentIndex + 1, 'next'); // Swipe Left -> Next
-      } else {
-        goToSlide(currentIndex - 1, 'prev'); // Swipe Right -> Prev
-      }
-    }
-  }
-
-  // Event Listeners Setup
-  function setupEventListeners() {
-    // Navigation
-    btnNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
-    btnPrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
-    hotspotNext.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
-    hotspotPrev.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
-
-    slideInput.addEventListener('change', (e) => {
-      const val = parseInt(e.target.value, 10);
-      if (!isNaN(val)) goToSlide(val - 1);
-    });
-
-    // Header buttons
-    btnFullscreen.addEventListener('click', toggleFullscreen);
-    btnGrid.addEventListener('click', () => gridModal.classList.add('active'));
-    btnCloseGrid.addEventListener('click', () => gridModal.classList.remove('active'));
-    gridSearchInput.addEventListener('input', (e) => renderGridThumbnails(e.target.value));
-
-    btnSearch.addEventListener('click', () => {
-      searchModal.classList.add('active');
-      searchInput.focus();
-    });
-    btnCloseSearch.addEventListener('click', () => searchModal.classList.remove('active'));
-    searchInput.addEventListener('input', (e) => performSearch(e.target.value));
-
-    btnPresenter.addEventListener('click', () => presenterPanel.classList.toggle('active'));
-    btnClosePresenter.addEventListener('click', () => presenterPanel.classList.remove('active'));
-
-    btnHelp.addEventListener('click', () => helpModal.classList.add('active'));
-    btnCloseHelp.addEventListener('click', () => helpModal.classList.remove('active'));
-
-    btnOriginalPdf.addEventListener('click', () => {
-      window.open('Green Monochromatic Simple The Minimalist Presentation Template.pdf', '_blank');
-    });
-
-    // Auto play & Speed
-    btnAutoplay.addEventListener('click', toggleAutoplay);
-
-    // Laser & Pen
-    btnLaser.addEventListener('click', toggleLaser);
-    btnDraw.addEventListener('click', toggleDrawingMode);
-    btnCloseDraw.addEventListener('click', toggleDrawingMode);
-    btnClearCanvas.addEventListener('click', clearCanvas);
-
-    penSizeInput.addEventListener('input', (e) => currentPenSize = e.target.value);
-    colorDots.forEach(dot => {
-      dot.addEventListener('click', (e) => {
-        colorDots.forEach(d => d.classList.remove('active'));
-        e.target.classList.add('active');
-        currentPenColor = e.target.getAttribute('data-color');
-      });
-    });
-
-    // Drawing Canvas events
-    drawingCanvas.addEventListener('mousedown', startDrawing);
-    drawingCanvas.addEventListener('mousemove', draw);
-    drawingCanvas.addEventListener('mouseup', stopDrawing);
-    drawingCanvas.addEventListener('mouseleave', stopDrawing);
-
-    // Laser Pointer movement
-    presentationStage.addEventListener('mousemove', (e) => {
-      if (isLaserActive) {
-        laserPointer.style.left = `${e.clientX}px`;
-        laserPointer.style.top = `${e.clientY}px`;
-      }
-    });
-
-    // Touch events for mobile/tablet swipe
-    presentationStage.addEventListener('touchstart', handleTouchStart, { passive: true });
-    presentationStage.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    // Presenter Timer
-    btnTimerStart.addEventListener('click', toggleTimer);
-    btnTimerReset.addEventListener('click', resetTimer);
-
-    // Window Resize -> Resize canvas
-    window.addEventListener('resize', resizeCanvas);
-
-    // Keyboard Shortcuts
-    window.addEventListener('keydown', (e) => {
-      // Don't trigger if user is typing in inputs
-      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-        if (e.key === 'Escape') {
-          document.activeElement.blur();
-          gridModal.classList.remove('active');
-          searchModal.classList.remove('active');
-          helpModal.classList.remove('active');
-        }
-        return;
-      }
-
-      switch (e.key) {
-        case 'ArrowRight':
-        case 'Space':
-        case 'PageDown':
-          e.preventDefault();
-          goToSlide(currentIndex + 1, 'next');
-          break;
-        case 'ArrowLeft':
-        case 'PageUp':
-          e.preventDefault();
-          goToSlide(currentIndex - 1, 'prev');
-          break;
-        case 'Home':
-          goToSlide(0);
-          break;
-        case 'End':
-          goToSlide(totalSlides - 1);
-          break;
-        case 'f':
-        case 'F':
-          toggleFullscreen();
-          break;
-        case 'o':
-        case 'O':
-        case 'g':
-        case 'G':
-          gridModal.classList.toggle('active');
-          break;
-        case 'p':
-        case 'P':
-          presenterPanel.classList.toggle('active');
-          break;
-        case 's':
-        case 'S':
-          searchModal.classList.toggle('active');
-          if (searchModal.classList.contains('active')) searchInput.focus();
-          break;
-        case 'l':
-        case 'L':
-          toggleLaser();
-          break;
-        case 'd':
-        case 'D':
-          toggleDrawingMode();
-          break;
-        case 'b':
-        case 'B':
-          toggleBlackout();
-          break;
-        case 'w':
-        case 'W':
-          toggleWhiteout();
-          break;
-        case '?':
-          helpModal.classList.toggle('active');
-          break;
-        case 'Escape':
-          gridModal.classList.remove('active');
-          searchModal.classList.remove('active');
-          helpModal.classList.remove('active');
-          if (isBlackout || isWhiteout) {
-            screenOverlay.className = 'screen-overlay';
-            isBlackout = false;
-            isWhiteout = false;
+        const filter = btn.getAttribute('data-filter');
+        methodCards.forEach(card => {
+          const category = card.getAttribute('data-category');
+          if (filter === 'all' || filter === category) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
           }
-          break;
+        });
+      });
+    });
+  }
+
+  // Method Detail Modals
+  function initModals() {
+    const detailModal = document.getElementById('detailModal');
+    const modalBody = document.getElementById('detailModalBody');
+    const btnClose = document.getElementById('btnCloseDetailModal');
+    const actionBtns = document.querySelectorAll('.card-action-btn');
+
+    actionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalKey = btn.getAttribute('data-modal');
+        const data = METHOD_DETAILS[modalKey];
+
+        if (data) {
+          modalBody.innerHTML = `
+            <div class="modal-detail-header" style="margin-bottom: 20px;">
+              <span class="section-badge">${data.badge}</span>
+              <h2 style="font-size: 1.8rem; margin-top: 6px;">${data.title}</h2>
+            </div>
+            <img src="${data.image}" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 20px;">
+            <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">${data.description}</p>
+            <h4 style="font-size: 1rem; color: var(--primary-mint); margin-bottom: 10px;">Key Takeaways:</h4>
+            <ul style="padding-left: 20px; color: var(--text-muted); font-size: 0.9rem;">
+              ${data.points.map(p => `<li style="margin-bottom: 8px;">${p}</li>`).join('')}
+            </ul>
+          `;
+          detailModal.classList.add('active');
+        }
+      });
+    });
+
+    btnClose.addEventListener('click', () => detailModal.classList.remove('active'));
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.classList.remove('active');
+    });
+  }
+
+  // Accordions
+  function initAccordions() {
+    const headers = document.querySelectorAll('.accordion-header');
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.parentElement;
+        item.classList.toggle('active');
+      });
+    });
+  }
+
+  // Strategy Tabs
+  function initTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+  }
+
+  // Interactive Quiz Logic
+  function initQuiz() {
+    const quizQuestionNumber = document.getElementById('quizQuestionNumber');
+    const quizScoreCount = document.getElementById('quizScoreCount');
+    const quizQuestionText = document.getElementById('quizQuestionText');
+    const quizOptionsList = document.getElementById('quizOptionsList');
+    const quizFeedback = document.getElementById('quizFeedback');
+    const quizFeedbackTitle = document.getElementById('quizFeedbackTitle');
+    const quizFeedbackText = document.getElementById('quizFeedbackText');
+    const btnNextQuestion = document.getElementById('btnNextQuestion');
+    const quizProgressFill = document.getElementById('quizProgressFill');
+    const quizCard = document.getElementById('quizCard');
+    const quizResultCard = document.getElementById('quizResultCard');
+    const btnRestartQuiz = document.getElementById('btnRestartQuiz');
+
+    function loadQuestion() {
+      const q = QUIZ_QUESTIONS[currentQuizIndex];
+      quizQuestionNumber.textContent = `Question ${currentQuizIndex + 1} of ${QUIZ_QUESTIONS.length}`;
+      quizScoreCount.textContent = `Score: ${quizScore}`;
+      quizQuestionText.textContent = q.question;
+
+      quizProgressFill.style.width = `${((currentQuizIndex + 1) / QUIZ_QUESTIONS.length) * 100}%`;
+
+      quizOptionsList.innerHTML = '';
+      quizFeedback.style.display = 'none';
+      btnNextQuestion.style.display = 'none';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.innerHTML = `<span>${opt}</span>`;
+        btn.addEventListener('click', () => selectAnswer(idx, q));
+        quizOptionsList.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selectedIndex, q) {
+      const options = quizOptionsList.querySelectorAll('.quiz-option');
+      options.forEach(opt => opt.style.pointerEvents = 'none');
+
+      if (selectedIndex === q.correct) {
+        options[selectedIndex].classList.add('correct');
+        quizScore++;
+        quizFeedbackTitle.textContent = 'Correct!';
+        quizFeedbackTitle.style.color = 'var(--primary-emerald)';
+      } else {
+        options[selectedIndex].classList.add('incorrect');
+        options[q.correct].classList.add('correct');
+        quizFeedbackTitle.textContent = 'Incorrect!';
+        quizFeedbackTitle.style.color = '#ff4757';
+      }
+
+      quizFeedbackText.textContent = q.explanation;
+      quizFeedback.style.display = 'block';
+      btnNextQuestion.style.display = 'inline-flex';
+      quizScoreCount.textContent = `Score: ${quizScore}`;
+    }
+
+    btnNextQuestion.addEventListener('click', () => {
+      currentQuizIndex++;
+      if (currentQuizIndex < QUIZ_QUESTIONS.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    function showResults() {
+      quizCard.style.display = 'none';
+      quizResultCard.style.display = 'block';
+      document.getElementById('resultScoreText').textContent = `You scored ${quizScore} out of ${QUIZ_QUESTIONS.length}`;
+    }
+
+    btnRestartQuiz.addEventListener('click', () => {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      quizResultCard.style.display = 'none';
+      quizCard.style.display = 'block';
+      loadQuestion();
+    });
+
+    loadQuestion();
+  }
+
+  // Global Search Dropdown
+  function initSearch() {
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+
+    const searchData = [
+      { title: 'Lecture Method', sec: '#methods', snippet: 'Oral presentation by an expert to clarify information.' },
+      { title: 'Demonstration / Performance', sec: '#methods', snippet: 'Modeling a skill first with real concrete examples.' },
+      { title: 'Discussion Method', sec: '#methods', snippet: 'Two-way exchange of attitudes and opinions.' },
+      { title: 'Case Study', sec: '#methods', snippet: 'In-depth real-world investigation of a subject.' },
+      { title: 'Field Studies & Field Trips', sec: '#methods', snippet: 'Out-of-classroom qualitative research activity.' },
+      { title: 'Simulation Games & Virtual Labs', sec: '#methods', snippet: 'Recreating real conditions in controlled environments.' },
+      { title: 'Role Playing', sec: '#methods', snippet: 'Dramatic enactment of learning situations.' },
+      { title: 'Question & Answer Technique', sec: '#techniques', snippet: 'Knowledge-focused general technique.' },
+      { title: 'Drill Method Technique', sec: '#techniques', snippet: 'Skill & habit reinforcement technique.' },
+      { title: 'Direct Instruction', sec: '#strategies', snippet: 'Explicit teaching, think-alouds, and guided practice.' },
+      { title: 'Collaborative Learning', sec: '#strategies', snippet: 'Think-Pair-Share, jigsaw, and group projects.' },
+      { title: 'Inquiry-Based Learning', sec: '#strategies', snippet: 'Student-driven exploration and Socratic seminars.' },
+      { title: 'Differentiated Instruction', sec: '#strategies', snippet: 'Tiered assignments and choice boards.' },
+      { title: 'Educational Devices & Tools', sec: '#devices', snippet: 'Material, mental, and electronic teaching aids.' }
+    ];
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        searchDropdown.classList.remove('active');
+        return;
+      }
+
+      const matches = searchData.filter(d => d.title.toLowerCase().includes(q) || d.snippet.toLowerCase().includes(q));
+
+      if (matches.length === 0) {
+        searchDropdown.innerHTML = `<div style="padding: 12px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">No matches found</div>`;
+      } else {
+        searchDropdown.innerHTML = matches.map(m => `
+          <div class="search-result-row" onclick="location.href='${m.sec}'">
+            <h5>${m.title}</h5>
+            <p>${m.snippet}</p>
+          </div>
+        `).join('');
+      }
+
+      searchDropdown.classList.add('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+        searchDropdown.classList.remove('active');
       }
     });
   }
 
-  // Run on DOM Ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  // Metrics Animated Counters
+  function animateMetrics() {
+    const counters = document.querySelectorAll('.metric-num');
+    counters.forEach(counter => {
+      const target = parseInt(counter.getAttribute('data-target'), 10);
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 20));
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+          counter.textContent = target;
+          clearInterval(timer);
+        } else {
+          counter.textContent = current;
+        }
+      }, 50);
+    });
   }
+
 })();
