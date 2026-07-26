@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Instructional Material & Strategies - Instant 0ms Responsive Slide Deck
+   Instructional Material & Strategies - Fully Responsive Slide Deck
    ========================================================================== */
 
 :root {
@@ -157,6 +157,13 @@ html, body {
   border-color: var(--primary-mint);
 }
 
+.header-btn.edit-active {
+  background: var(--primary-gold);
+  color: #0b1510;
+  border-color: var(--primary-gold);
+  font-weight: 700;
+}
+
 /* Presentation Stage & Slide Frame */
 .stage {
   position: absolute;
@@ -269,6 +276,39 @@ html, body {
 .color-dot.active { transform: scale(1.25); border-color: #fff; }
 .draw-btn-sm { background: transparent; border: none; color: var(--text-main); font-size: 0.8rem; cursor: pointer; }
 .draw-btn-sm.close { background: var(--primary-mint); color: var(--bg-dark); font-weight: 700; padding: 4px 12px; border-radius: 12px; }
+
+/* Inline Edit Mode Floating Toolbar */
+.edit-bar {
+  position: fixed; top: calc(var(--header-height) + 12px); left: 50%; transform: translateX(-50%);
+  background: var(--bg-glass); backdrop-filter: blur(16px); border: 1px solid var(--primary-gold);
+  border-radius: 30px; padding: 6px 18px; display: flex; align-items: center; gap: 14px; z-index: 200;
+  box-shadow: 0 0 20px rgba(236, 204, 104, 0.3);
+}
+
+.edit-status { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); }
+
+.edit-btn-sm {
+  background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-color); color: var(--text-main);
+  font-size: 0.78rem; font-weight: 600; padding: 4px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+}
+
+.edit-btn-sm:hover { border-color: var(--primary-gold); color: var(--primary-gold); }
+
+.edit-btn-sm.close { background: var(--primary-gold); color: #0b1510; font-weight: 700; border-color: var(--primary-gold); }
+
+/* Content Editable Highlight in Edit Mode */
+.edit-mode [contenteditable="true"] {
+  outline: 2px dashed rgba(236, 204, 104, 0.6) !important;
+  outline-offset: 4px;
+  cursor: text !important;
+  border-radius: 4px;
+  transition: outline-color 0.2s ease, background 0.2s ease;
+}
+
+.edit-mode [contenteditable="true"]:focus {
+  outline: 2px solid var(--primary-gold) !important;
+  background: rgba(236, 204, 104, 0.1) !important;
+}
 
 /* Footer Deck Controls */
 .deck-footer {

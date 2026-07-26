@@ -1,5 +1,5 @@
 /**
- * Instructional Material & Strategies - Instant 0ms Slide Deck Controller
+ * Instructional Material & Strategies - Slide Deck Controller with PowerPoint Live Text Edit Mode
  */
 
 (function () {
@@ -12,6 +12,7 @@
   let autoplayTimer = null;
   let isLaserActive = false;
   let isDrawingMode = false;
+  let isEditMode = false;
   let isBlackout = false;
   let isWhiteout = false;
   let timerInterval = null;
@@ -41,9 +42,15 @@
   const btnPresenter = document.getElementById('btnPresenter');
   const btnDraw = document.getElementById('btnDraw');
   const btnLaser = document.getElementById('btnLaser');
+  const btnEdit = document.getElementById('btnEdit');
   const btnHelp = document.getElementById('btnHelp');
   const btnAutoplay = document.getElementById('btnAutoplay');
   const autoplaySpeed = document.getElementById('autoplaySpeed');
+
+  // Edit Toolbar
+  const editBar = document.getElementById('editBar');
+  const btnResetSlideText = document.getElementById('btnResetSlideText');
+  const btnCloseEdit = document.getElementById('btnCloseEdit');
 
   // Drawing Canvas
   const drawingCanvas = document.getElementById('drawingCanvas');
@@ -122,11 +129,22 @@
     }
   }
 
-  // Render HTML Slide Content
+  // Render HTML Slide Content (With localStorage Overrides for Edited Text)
   function renderSlideContent(idx) {
     if (typeof DECK_SLIDES === 'undefined' || !DECK_SLIDES.length) return;
-    const slide = DECK_SLIDES[idx] || { number: idx + 1, tag: 'REPORTING', title: `Slide ${idx + 1}`, paragraphs: [] };
+    let slide = DECK_SLIDES[idx] || { number: idx + 1, tag: 'REPORTING', title: `Slide ${idx + 1}`, paragraphs: [] };
     
+    // Check for saved local edit
+    const savedEdit = localStorage.getItem(`slide_edit_${idx}`);
+    if (savedEdit) {
+      try {
+        const parsed = JSON.parse(savedEdit);
+        slide = { ...slide, ...parsed };
+      } catch (e) {
+        console.error('Failed parsing slide edit:', e);
+      }
+    }
+
     if (currentSlideTag) currentSlideTag.textContent = slide.tag || 'REPORTING';
 
     let html = '';
@@ -135,9 +153,9 @@
     if (slide.number === 1) {
       html = `
         <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
-          <span class="slide-header-tag">${slide.tag || 'INTRODUCTION'}</span>
-          <h1 class="slide-title-hero">INSTRUCTIONAL MATERIAL / STRATEGY OF TEACHING</h1>
-          <p class="slide-subtitle">A Comprehensive Guide to Methods, Techniques, Strategies & Educational Devices</p>
+          <span class="slide-header-tag editable-target" data-field="tag">${slide.tag || 'INTRODUCTION'}</span>
+          <h1 class="slide-title-hero editable-target" data-field="title">${slide.title || 'INSTRUCTIONAL MATERIAL / STRATEGY OF TEACHING'}</h1>
+          <p class="slide-subtitle editable-target" data-field="subtitle">${slide.subtitle || 'A Comprehensive Guide to Methods, Techniques, Strategies & Educational Devices'}</p>
           <div style="margin-top: 20px; display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 16px; background: rgba(0,0,0,0.35); padding: 12px 24px; border-radius: 30px; border: 1px solid var(--border-mint);">
             <span style="font-size: 0.9rem; color: var(--primary-mint); font-weight: 700;">Group 5 • BSIT-31A</span>
             <span style="font-size: 0.9rem; color: var(--text-muted);">Shawn Garcia • Liceria & Co.</span>
@@ -149,11 +167,11 @@
     else if (slide.number === 45) {
       html = `
         <div style="text-align: center; max-width: 800px; margin: 0 auto; padding: 24px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid var(--border-mint); width: 100%;">
-          <span class="slide-header-tag">BIBLE VERSE</span>
-          <h2 style="font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.8rem); color: #fff; line-height: 1.6; margin-bottom: 16px;">
-            “A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”
+          <span class="slide-header-tag editable-target" data-field="tag">BIBLE VERSE</span>
+          <h2 class="editable-target" data-field="title" style="font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.8rem); color: #fff; line-height: 1.6; margin-bottom: 16px;">
+            ${slide.title || '“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”'}
           </h2>
-          <div style="font-size: 1.1rem; color: var(--primary-mint); font-weight: 800; letter-spacing: 0.05em;">PROVERBS 24:5-6</div>
+          <div class="editable-target" data-field="citation" style="font-size: 1.1rem; color: var(--primary-mint); font-weight: 800; letter-spacing: 0.05em;">${slide.citation || 'PROVERBS 24:5-6'}</div>
         </div>
       `;
     }
@@ -161,9 +179,9 @@
     else if (slide.number === 46) {
       html = `
         <div style="text-align: center; max-width: 700px; margin: 0 auto; width: 100%;">
-          <span class="slide-header-tag">THE END</span>
-          <h1 class="slide-title-hero">THANK YOU FOR LISTENING</h1>
-          <p style="font-size: 1.1rem; color: var(--text-muted); margin-top: 16px;">Shawn Garcia • Liceria & Co.</p>
+          <span class="slide-header-tag editable-target" data-field="tag">THE END</span>
+          <h1 class="slide-title-hero editable-target" data-field="title">${slide.title || 'THANK YOU FOR LISTENING'}</h1>
+          <p class="editable-target" data-field="subtitle" style="font-size: 1.1rem; color: var(--text-muted); margin-top: 16px;">${slide.subtitle || 'Shawn Garcia • Liceria & Co.'}</p>
         </div>
       `;
     }
@@ -176,20 +194,20 @@
         displayParas = [slide.raw_text.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()];
       }
 
-      const contentHtml = displayParas.map(p => {
+      const contentHtml = displayParas.map((p, pIdx) => {
         if (/^[-•*▪]\s|^\d+\.\s/.test(p)) {
-          return `<div class="slide-paragraph-box"><span class="bullet-icon">✦</span><span>${p}</span></div>`;
+          return `<div class="slide-paragraph-box"><span class="bullet-icon">✦</span><span class="editable-target" data-para-idx="${pIdx}">${p}</span></div>`;
         } else {
-          return `<p class="slide-paragraph-plain">${p}</p>`;
+          return `<p class="slide-paragraph-plain editable-target" data-para-idx="${pIdx}">${p}</p>`;
         }
       }).join('');
 
       if (hasImage) {
         html = `
-          <span class="slide-header-tag">${slide.tag || 'REPORTING'}</span>
+          <span class="slide-header-tag editable-target" data-field="tag">${slide.tag || 'REPORTING'}</span>
           <div class="slide-split-grid">
             <div>
-              <h2 class="slide-main-title">${slide.title}</h2>
+              <h2 class="slide-main-title editable-target" data-field="title">${slide.title}</h2>
               <div class="slide-text-container">
                 ${contentHtml}
               </div>
@@ -201,8 +219,8 @@
         `;
       } else {
         html = `
-          <span class="slide-header-tag">${slide.tag || 'REPORTING'}</span>
-          <h2 class="slide-main-title">${slide.title}</h2>
+          <span class="slide-header-tag editable-target" data-field="tag">${slide.tag || 'REPORTING'}</span>
+          <h2 class="slide-main-title editable-target" data-field="title">${slide.title}</h2>
           <div class="slide-text-container">
             ${contentHtml}
           </div>
@@ -210,7 +228,82 @@
       }
     }
 
-    if (slideBody) slideBody.innerHTML = html;
+    if (slideBody) {
+      slideBody.innerHTML = html;
+      applyEditModeState();
+    }
+  }
+
+  // Toggle Live Edit Mode
+  function toggleEditMode() {
+    isEditMode = !isEditMode;
+    if (btnEdit) btnEdit.classList.toggle('edit-active', isEditMode);
+    if (editBar) editBar.style.display = isEditMode ? 'flex' : 'none';
+    document.body.classList.toggle('edit-mode', isEditMode);
+
+    if (isEditMode && isDrawingMode) toggleDrawingMode();
+    if (isEditMode && isLaserActive) toggleLaser();
+
+    applyEditModeState();
+  }
+
+  // Apply contenteditable state to editable targets
+  function applyEditModeState() {
+    if (!slideBody) return;
+    const editableElements = slideBody.querySelectorAll('.editable-target');
+    
+    editableElements.forEach(el => {
+      if (isEditMode) {
+        el.setAttribute('contenteditable', 'true');
+        el.addEventListener('input', saveSlideEdits);
+        el.addEventListener('blur', saveSlideEdits);
+      } else {
+        el.removeAttribute('contenteditable');
+      }
+    });
+  }
+
+  // Save current slide text edits to localStorage
+  function saveSlideEdits() {
+    if (!slideBody) return;
+
+    const baseSlide = DECK_SLIDES[currentIndex];
+    const editedData = {
+      tag: baseSlide.tag,
+      title: baseSlide.title,
+      paragraphs: [...(baseSlide.paragraphs || [])]
+    };
+
+    const tagEl = slideBody.querySelector('.editable-target[data-field="tag"]');
+    if (tagEl) editedData.tag = tagEl.innerText.trim();
+
+    const titleEl = slideBody.querySelector('.editable-target[data-field="title"]');
+    if (titleEl) editedData.title = titleEl.innerText.trim();
+
+    const paraEls = slideBody.querySelectorAll('.editable-target[data-para-idx]');
+    if (paraEls.length > 0) {
+      editedData.paragraphs = [];
+      paraEls.forEach(pEl => {
+        editedData.paragraphs.push(pEl.innerText.trim());
+      });
+    }
+
+    localStorage.setItem(`slide_edit_${currentIndex}`, JSON.stringify(editedData));
+    updateGridItemTitle(currentIndex, editedData.title);
+  }
+
+  // Reset slide back to original text
+  function resetSlideEdits() {
+    localStorage.removeItem(`slide_edit_${currentIndex}`);
+    renderSlideContent(currentIndex);
+    const origTitle = DECK_SLIDES[currentIndex].title;
+    updateGridItemTitle(currentIndex, origTitle);
+  }
+
+  function updateGridItemTitle(idx, newTitle) {
+    if (!gridContainer) return;
+    const item = gridContainer.querySelector(`.grid-item[data-index="${idx}"] .grid-title`);
+    if (item) item.textContent = newTitle;
   }
 
   // Update Presenter Notes
@@ -263,12 +356,19 @@
     if (!gridContainer || typeof DECK_SLIDES === 'undefined') return;
     gridContainer.innerHTML = '';
     DECK_SLIDES.forEach((slide, idx) => {
+      // Check saved edits for grid view
+      let displayTitle = slide.title;
+      const savedEdit = localStorage.getItem(`slide_edit_${idx}`);
+      if (savedEdit) {
+        try { displayTitle = JSON.parse(savedEdit).title || displayTitle; } catch(e) {}
+      }
+
       const item = document.createElement('div');
       item.className = `grid-item ${idx === currentIndex ? 'active' : ''}`;
       item.setAttribute('data-index', idx);
       item.innerHTML = `
         <div class="grid-num">SLIDE ${slide.number}</div>
-        <div class="grid-title">${slide.title}</div>
+        <div class="grid-title">${displayTitle}</div>
       `;
 
       item.addEventListener('click', () => {
@@ -317,6 +417,7 @@
     if (btnLaser) btnLaser.classList.toggle('active', isLaserActive);
     if (laserPointer) laserPointer.style.display = isLaserActive ? 'block' : 'none';
     if (isLaserActive && isDrawingMode) toggleDrawingMode();
+    if (isLaserActive && isEditMode) toggleEditMode();
   }
 
   // Pen Drawing Tool
@@ -326,6 +427,7 @@
     if (drawingBar) drawingBar.style.display = isDrawingMode ? 'flex' : 'none';
     document.body.classList.toggle('drawing-mode', isDrawingMode);
     if (isDrawingMode && isLaserActive) toggleLaser();
+    if (isDrawingMode && isEditMode) toggleEditMode();
   }
 
   function resizeCanvas() {
@@ -394,6 +496,7 @@
 
   function handleTouchStart(e) { touchStartX = e.changedTouches[0].screenX; }
   function handleTouchEnd(e) {
+    if (isEditMode) return;
     touchEndX = e.changedTouches[0].screenX;
     const diff = touchEndX - touchStartX;
     if (Math.abs(diff) > 50) {
@@ -415,6 +518,10 @@
         if (!isNaN(val)) goToSlide(val - 1);
       });
     }
+
+    if (btnEdit) btnEdit.addEventListener('click', toggleEditMode);
+    if (btnCloseEdit) btnCloseEdit.addEventListener('click', toggleEditMode);
+    if (btnResetSlideText) btnResetSlideText.addEventListener('click', resetSlideEdits);
 
     if (btnFullscreen) btnFullscreen.addEventListener('click', toggleFullscreen);
     if (btnGrid) btnGrid.addEventListener('click', () => { if (gridModal) gridModal.classList.add('active'); });
@@ -467,9 +574,16 @@
     window.addEventListener('resize', resizeCanvas);
 
     window.addEventListener('keydown', (e) => {
-      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      // Don't trigger shortcuts if user is typing inside input or editing slide text
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable) {
+        if (e.key === 'Escape') {
+          if (document.activeElement) document.activeElement.blur();
+        }
+        return;
+      }
 
       switch (e.key) {
+        case 'e': case 'E': toggleEditMode(); break;
         case 'ArrowRight':
         case 'Space':
         case 'PageDown':
@@ -492,6 +606,7 @@
         case 'w': case 'W': toggleWhiteout(); break;
         case '?': if (helpModal) helpModal.classList.toggle('active'); break;
         case 'Escape':
+          if (isEditMode) toggleEditMode();
           if (gridModal) gridModal.classList.remove('active');
           if (helpModal) helpModal.classList.remove('active');
           if (isBlackout || isWhiteout) {
