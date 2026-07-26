@@ -85,12 +85,14 @@
 
   // Initialize Application
   function init() {
-    // Clear legacy cached edits from earlier broken versions
-    const CURRENT_DECK_VERSION = 'v3_bible_verse_fixed';
+    // Clear legacy cached edits from earlier versions
+    const CURRENT_DECK_VERSION = 'v4_icebreaker_bibleverse_fixed';
     if (localStorage.getItem('deck_version') !== CURRENT_DECK_VERSION) {
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('slide_edit_')) localStorage.removeItem(key);
-      });
+      try {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('slide_edit_')) localStorage.removeItem(key);
+        });
+      } catch (e) {}
       localStorage.setItem('deck_version', CURRENT_DECK_VERSION);
     }
 
@@ -172,12 +174,32 @@
         </div>
       `;
     }
+    // Ice Breaker Slide (Slide 4)
+    else if (slide.number === 4) {
+      const hasImage = slide.images && slide.images.length > 0;
+      if (hasImage) {
+        html = `
+          <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
+            <span class="slide-header-tag editable-target" data-field="tag">ICE BREAKER</span>
+            <h1 class="slide-title-hero editable-target" data-field="title" style="font-size: clamp(2.2rem, 5vw, 3.8rem); color: var(--primary-mint); margin-bottom: 24px;">ICE BREAKER</h1>
+            <div class="slide-image-box" style="max-height: clamp(250px, 45vh, 400px); margin: 0 auto;">
+              <img src="${slide.images[0]}" alt="Ice Breaker" decoding="async" loading="lazy">
+            </div>
+          </div>
+        `;
+      } else {
+        html = `
+          <div style="text-align: center; max-width: 850px; margin: 0 auto; width: 100%;">
+            <span class="slide-header-tag editable-target" data-field="tag">ICE BREAKER</span>
+            <h1 class="slide-title-hero editable-target" data-field="title" style="font-size: clamp(2.5rem, 6vw, 4.2rem); color: var(--primary-mint); margin-top: 20px;">ICE BREAKER</h1>
+          </div>
+        `;
+      }
+    }
     // Bible Verse Slide (Slide 45)
     else if (slide.number === 45) {
-      const verseText = (slide.paragraphs && slide.paragraphs[0])
-        ? slide.paragraphs[0]
-        : "“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”";
-      const citation = slide.citation || "PROVERBS 24:5-6";
+      const verseText = "“A WISE MAN IS FULL OF STRENGTH, AND A MAN OF KNOWLEDGE ENHANCES HIS MIGHT, FOR BY WISE GUIDANCE YOU CAN WAGE YOUR WAR, AND IN ABUNDANCE OF COUNSELORS THERE IS VICTORY.”";
+      const citation = "PROVERBS 24:5-6";
 
       html = `
         <div style="text-align: center; max-width: 850px; margin: 0 auto; padding: 32px 24px; background: rgba(0,0,0,0.35); border-radius: 16px; border: 1px solid var(--border-mint); width: 100%;">

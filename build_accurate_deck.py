@@ -47,11 +47,9 @@ curated_slides = [
     # Slide 4
     {
         'number': 4,
-        'tag': 'TEACHING METHODS',
-        'title': 'TEACHING METHODS OVERVIEW',
-        'paragraphs': [
-            "Introduction to teaching methodology and procedural frameworks."
-        ]
+        'tag': 'ICE BREAKER',
+        'title': 'ICE BREAKER',
+        'paragraphs': []
     },
     # Slide 5
     {

@@ -38,11 +38,9 @@ const DECK_SLIDES = [
   },
   {
     "number": 4,
-    "tag": "TEACHING METHODS",
-    "title": "TEACHING METHODS OVERVIEW",
-    "paragraphs": [
-      "Introduction to teaching methodology and procedural frameworks."
-    ],
+    "tag": "ICE BREAKER",
+    "title": "ICE BREAKER",
+    "paragraphs": [],
     "images": [
       "assets/images/img_slide_04_1.jpeg"
     ],
